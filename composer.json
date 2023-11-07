@@ -1,0 +1,16 @@
+{
+    "name": "mazbaz/project-tmtc",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Mazbaz\\ProjectTmtc\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MazBaz",
+            "email": "mrlog42@gmail.com"
+        }
+    ],
+    "require": {}
+}
