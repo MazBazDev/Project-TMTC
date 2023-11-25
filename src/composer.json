@@ -1,9 +1,8 @@
 {
-    "name": "mazbaz/project-tmtc",
-    "type": "project",
+    "name": "mazbaz/tmtc",
     "autoload": {
         "psr-4": {
-            "Mazbaz\\ProjectTmtc\\": "src/"
+            "app\\": "./"
         }
     },
     "authors": [
