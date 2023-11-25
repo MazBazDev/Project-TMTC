@@ -11,5 +11,7 @@
             "email": "mrlog42@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "symfony/console": "^6.3"
+    }
 }

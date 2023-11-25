@@ -1,0 +1,12 @@
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use app\core\Application;
+
+$app = new Application(__DIR__);
+
+$argv = $_SERVER['argv'];
+array_shift($argv);
+
+$app->run();

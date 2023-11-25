@@ -4,10 +4,18 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="Mazbaz\ProjectTmtc\" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/." isTestSource="false" packagePrefix="app\" />
       <excludeFolder url="file://$MODULE_DIR$/src/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/polyfill-intl-grapheme" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/polyfill-intl-normalizer" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/string" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
