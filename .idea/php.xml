@@ -23,6 +23,10 @@
       <path value="$PROJECT_DIR$/src/vendor/symfony/deprecation-contracts" />
       <path value="$PROJECT_DIR$/src/vendor/symfony/polyfill-ctype" />
       <path value="$PROJECT_DIR$/src/vendor/symfony/string" />
+      <path value="$PROJECT_DIR$/src/vendor/symfony/polyfill-php80" />
+      <path value="$PROJECT_DIR$/src/vendor/graham-campbell/result-type" />
+      <path value="$PROJECT_DIR$/src/vendor/vlucas/phpdotenv" />
+      <path value="$PROJECT_DIR$/src/vendor/phpoption/phpoption" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.4" />

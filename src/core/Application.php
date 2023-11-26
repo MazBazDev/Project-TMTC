@@ -2,6 +2,7 @@
 
 namespace app\core;
 
+use Dotenv\Dotenv;
 use Symfony\Component\Console\Application as SymfonyConsole;
 use app\core\Commands\MakeMigrationCommand;
 class Application
@@ -29,6 +30,9 @@ class Application
 
     public function run()
     {
+        $dotenv = Dotenv::createImmutable(self::$ROOT_DIR);
+        $dotenv->load();
+
         // Si la demande est faite via la console
         if (php_sapi_name() === 'cli') {
             $this->handleConsoleCommand();
