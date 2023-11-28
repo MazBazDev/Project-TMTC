@@ -1,6 +1,6 @@
 <?php
 
-namespace app\model;
+namespace Mazbaz\ProjectTmtc\models;
 
 class Model
 {

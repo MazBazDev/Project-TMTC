@@ -1,0 +1,1 @@
+// TODO: Command "chef install" = cp .env and fill, seed ?, migrate ?

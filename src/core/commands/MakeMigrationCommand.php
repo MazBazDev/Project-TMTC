@@ -22,25 +22,37 @@ class MakeMigrationCommand extends Command
         $migrationName = $input->getArgument('migration_name');
         $this->createMigration($migrationName, $output);
 
-        $output->writeln('Migration created successfully.');
+        $output->writeln('😃 Migration created successfully.');
         return Command::SUCCESS;
     }
 
     private function createMigration($migrationName, $output)
     {
-        $migrationFileName = 'migrations/' . $migrationName . "_". time() . '.php';
+        $migrationFileName = 'database/migrations/' . $migrationName . "_". time() . '.php';
 
         if (!file_exists($migrationFileName)) {
             file_put_contents($migrationFileName, $this->getMigrationStub());
         } else {
-            $output->writeln('Migration already exists.');
+            $output->writeln('😅 Migration already exists.');
         }
     }
 
     private function getMigrationStub()
     {
-        return '<?php
+        return "<?php
+namespace app\database\migrations;
 
-';
+return new class {
+    public function up()
+    {
+
+    }
+
+    public function down()
+    {
+
+    }
+};
+";
     }
 }
