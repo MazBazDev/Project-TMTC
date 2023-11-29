@@ -8,7 +8,9 @@ class Schema
     public static function create($tableName, callable $callback)
     {
         $columns = new Columns();
+
         $callback($columns);
+
 
         $sql = "CREATE TABLE IF NOT EXISTS $tableName (";
 
@@ -17,19 +19,20 @@ class Schema
 
             if (isset($attributes['nullable']) && $attributes['nullable']) {
                 $sql .= " NULL";
-            } else if (!isset($attributes['unique'])) {
+            } else {
                 $sql .= " NOT NULL";
             }
 
-            if (isset($attributes['default'])) {
-                $sql .= " DEFAULT '" . $attributes['default'] . "'";
+            if (isset($attributes['unique']) && $attributes['unique']) {
+                $sql .= " UNIQUE";
             }
 
-            if (isset($attributes['auto_increment'])) {
-                $sql .= " AUTO_INCREMENT";
+            if (isset($attributes['default'])) {
+                $sql .= " DEFAULT " . $attributes['default'];
             }
-            if (isset($attributes['unique'])) {
-                $sql .= " UNIQUE";
+
+            if (isset($attributes['auto_increment']) && $attributes['auto_increment']) {
+                $sql .= " AUTO_INCREMENT";
             }
 
             if (isset($attributes['primary']) && $attributes['primary']) {
@@ -49,8 +52,8 @@ class Schema
             }
         }
 
-        $sql = rtrim($sql, ", ") . ")";
-        echo $sql;
+        $sql = rtrim($sql, ", ") . ");";
+
         Application::$app->db->pdo->exec($sql);
     }
 }
