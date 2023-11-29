@@ -13,7 +13,7 @@ return new class {
             $columns->string("firstname");
             $columns->string("lastname");
             $columns->string("profile_picture")->nullable();
-            $columns->boolean("admin")->defaultSQL(false);
+            $columns->boolean("admin")->defaultSQL(false)->nullable(false);
             $columns->string("password");
         });
     }

@@ -5,41 +5,39 @@ use app\core\Application;
 
 class Schema
 {
-    public static function create($tableName, callable $callback)
+    private static function generateColumnSql($columnName, $attributes): string
     {
-        $columns = new Columns();
+        $sql = "$columnName {$attributes['type']}";
 
-        $callback($columns);
+        if (isset($attributes['nullable']) && $attributes['nullable']) {
+            $sql .= " NULL";
+        } else {
+            $sql .= " NOT NULL";
+        }
 
+        if (isset($attributes['unique']) && $attributes['unique']) {
+            $sql .= " UNIQUE";
+        }
 
-        $sql = "CREATE TABLE IF NOT EXISTS $tableName (";
+        if (isset($attributes['default'])) {
+            $sql .= " DEFAULT " . $attributes['default'];
+        }
 
+        if (isset($attributes['auto_increment']) && $attributes['auto_increment']) {
+            $sql .= " AUTO_INCREMENT";
+        }
+
+        if (isset($attributes['primary']) && $attributes['primary']) {
+            $sql .= " PRIMARY KEY";
+        }
+
+        return $sql;
+    }
+
+    private static function getSqlQuery($sql, Columns $columns): string
+    {
         foreach ($columns->getColumns() as $columnName => $attributes) {
-            $sql .= "$columnName {$attributes['type']}";
-
-            if (isset($attributes['nullable']) && $attributes['nullable']) {
-                $sql .= " NULL";
-            } else {
-                $sql .= " NOT NULL";
-            }
-
-            if (isset($attributes['unique']) && $attributes['unique']) {
-                $sql .= " UNIQUE";
-            }
-
-            if (isset($attributes['default'])) {
-                $sql .= " DEFAULT " . $attributes['default'];
-            }
-
-            if (isset($attributes['auto_increment']) && $attributes['auto_increment']) {
-                $sql .= " AUTO_INCREMENT";
-            }
-
-            if (isset($attributes['primary']) && $attributes['primary']) {
-                $sql .= " PRIMARY KEY";
-            }
-
-            $sql .= ", ";
+            $sql .= self::generateColumnSql($columnName, $attributes) . ", ";
         }
 
         foreach ($columns->getColumns() as $columnName => $attributes) {
@@ -52,7 +50,26 @@ class Schema
             }
         }
 
-        $sql = rtrim($sql, ", ") . ");";
+        return rtrim($sql, ", ") . ");";
+    }
+
+    public static function create($tableName, callable $callback)
+    {
+        $columns = new Columns();
+        $callback($columns);
+        $sql = "CREATE TABLE IF NOT EXISTS $tableName (";
+        Application::$app->db->pdo->exec(self::getSqlQuery($sql, $columns));
+    }
+
+    public static function edit($tableName, callable $callback)
+    {
+        $columns = new Columns();
+        $callback($columns);
+        $sql = "ALTER TABLE $tableName";
+
+        foreach ($columns->getColumns() as $columnName => $attributes) {
+            $sql .= " ADD COLUMN " . self::generateColumnSql($columnName, $attributes) . ";";
+        }
 
         Application::$app->db->pdo->exec($sql);
     }
