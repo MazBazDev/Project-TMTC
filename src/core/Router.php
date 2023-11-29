@@ -1,7 +1,11 @@
 <?php
 
 namespace app\core;
-use app\controllers\ContactController;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Loader\FilesystemLoader;
 
 class Router
 {
@@ -32,29 +36,29 @@ class Router
 
     public function renderView($view, $params = [])
     {
-        $layoutContent = $this->layoutContent();
-        $viewContent = $this->renderOnlyView($view, $params);
+        $loader = new FilesystemLoader(Application::$ROOT_DIR . "/views");
+        $twig = new Environment($loader);
 
-        return str_replace('{{content}}', $viewContent, $layoutContent);
+        return $twig->render($view . ".twig", $params);
     }
 
-    protected function layoutContent()
-    {
-        ob_start();
-        include_once Application::$ROOT_DIR."/views/layouts/main.php";
-        return ob_get_clean();
-    }
-
-    protected function renderOnlyView($view, $params)
-    {
-        foreach ($params as $key => $value) {
-            $$key = $value;
-        }
-
-        ob_start();
-        include_once Application::$ROOT_DIR."/views/$view.php";
-        return ob_get_clean();
-    }
+//    protected function layoutContent()
+//    {
+//        ob_start();
+//        include_once Application::$ROOT_DIR."/views/layouts/main.php";
+//        return ob_get_clean();
+//    }
+//
+//    protected function renderOnlyView($view, $params)
+//    {
+//        foreach ($params as $key => $value) {
+//            $$key = $value;
+//        }
+//
+//        ob_start();
+//        include_once Application::$ROOT_DIR."/views/$view.php";
+//        return ob_get_clean();
+//    }
 
     public function resolve()
     {
