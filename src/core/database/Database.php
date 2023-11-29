@@ -91,8 +91,8 @@ class Database
 
     private function recordMigration($migration)
     {
-//        $statement = $this->pdo->prepare("INSERT INTO migrations (migration) VALUES (:migration)");
-//        $statement->bindValue(':migration', $migration);
-//        $statement->execute();
+        $statement = $this->pdo->prepare("INSERT INTO migrations (migration) VALUES (:migration)");
+        $statement->bindValue(':migration', $migration);
+        $statement->execute();
     }
 }
