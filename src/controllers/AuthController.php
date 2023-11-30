@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\core\Controller;
 use app\core\Request;
+use app\models\User;
 
 class AuthController extends Controller
 {
@@ -24,11 +25,12 @@ class AuthController extends Controller
 
     public function register_store(Request $request)
     {
+        $request->validate([
+            "usernames" => "required",
+            "email" => "unique:app\models\User,email"
+        ]);
 
-
-        var_dump($request->getBody(), $request->validate([
-            "usernames" => "required"
-        ]));
+//        var_dump($request->getBody());
         return;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace app\core;
+use app\core\twig\Helpers;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -38,6 +39,22 @@ class Router
     {
         $loader = new FilesystemLoader(Application::$ROOT_DIR . "/views");
         $twig = new Environment($loader);
+
+        // Include the helper file
+        require_once Application::$ROOT_DIR . "/core/Helpers.php";
+
+
+        // Get all declared functions
+        $functions = get_defined_functions();
+
+        // Iterate through the functions and add them to Twig
+        foreach ($functions['user'] as $function) {
+            // Use lcfirst to make the first letter lowercase
+            $twigFunctionName = lcfirst($function);
+
+            $twig->addFunction(new \Twig\TwigFunction($twigFunctionName, $function));
+        }
+
 
         return $twig->render($view . ".twig", $params);
     }

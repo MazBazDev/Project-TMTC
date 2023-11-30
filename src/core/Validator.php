@@ -38,7 +38,11 @@ abstract class Validator
                 }
             }
         }
+        if (sizeof($errors) !== 0) {
+            Application::$app->response->redirect()->back()->with("inputs_errors", $errors);
 
+            return $errors;
+        }
         return $errors;
     }
 
@@ -51,6 +55,8 @@ abstract class Validator
                 return "The field '{$input}' must be at least {$params} characters long.";
             case 'max':
                 return "The field '{$input}' must be at most {$params} characters long.";
+            case 'unique':
+                return "The {$input} already exist.";
             default:
                 return "Validation error for the field '{$input}'.";
         }
@@ -95,7 +101,6 @@ abstract class Validator
         $inputDate = $this->input($inputName);
 
         if ($inputDate === null) {
-            // If the specified input doesn't exist, consider validation failed
             return false;
         }
 
@@ -110,7 +115,6 @@ abstract class Validator
         $inputDate = $this->input($inputName);
 
         if ($inputDate === null) {
-            // If the specified input doesn't exist, consider validation failed
             return false;
         }
 
@@ -120,4 +124,13 @@ abstract class Validator
         return $inputTimestamp < $inputDateTimestamp;
     }
 
+    private function unique($value, $inputName) : bool {
+        $class = explode(",", $inputName)[0];
+        $col = explode(",", $inputName)[1];
+
+        $class = new $class();
+        $exist = $class->where([$col, $value])->count();
+
+        return $exist === 0;
+    }
 }

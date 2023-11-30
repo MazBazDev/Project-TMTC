@@ -6,6 +6,9 @@ use app\controllers\AuthController;
 use app\controllers\ContactController;
 use app\controllers\HomeController;
 use app\core\Application;
+// Fuck deprecated errors
+
+error_reporting(E_ALL ^ E_DEPRECATED);
 
 $app = new Application(dirname(__DIR__));
 

@@ -2,7 +2,7 @@
 
 namespace app\core;
 
-use function MongoDB\BSON\toJSON;
+use PDO;
 
 class Models
 {
@@ -69,11 +69,21 @@ class Models
         return $results;
     }
 
-    public static function where($key, $value)
+    public static function where($sub = [])
     {
         $instance = new static();
+        $ope = "=";
 
-        $query = "SELECT * FROM {$instance->table} WHERE $key = '$value'";
+        if (sizeof($sub) === 2) {
+            $key = $sub[0];
+            $value = $sub[1];
+        } elseif (sizeof($sub) === 3) {
+            $key = $sub[0];
+            $ope = $sub[1];
+            $value = $sub[2];
+        }
+
+        $query = "SELECT * FROM {$instance->table} WHERE $key $ope '$value'";
 
         try {
             $stmt = Application::$app->db->pdo->query($query);
@@ -125,5 +135,29 @@ class Models
         }
 
         return $result;
+    }
+
+    public function count()
+    {
+        $instance = new static();
+
+        $query = "SELECT COUNT(*) as count FROM {$instance->table}";
+
+        try {
+            $stmt = Application::$app->db->pdo->query($query);
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($result !== false && isset($result['count'])) {
+                $count = intval($result['count']);
+
+                return $count;
+            } else {
+                return 0;
+            }
+        } catch (\PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+
+            return null;
+        }
     }
 }
