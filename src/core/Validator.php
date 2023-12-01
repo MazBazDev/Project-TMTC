@@ -129,8 +129,7 @@ abstract class Validator
         $col = explode(",", $inputName)[1];
 
         $class = new $class();
-        $exist = $class->where([$col, $value])->count();
 
-        return $exist === 0;
+        return $class->where([$col, $value]);
     }
 }
