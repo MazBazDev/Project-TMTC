@@ -213,4 +213,85 @@ class Models
             return null;
         }
     }
+
+    public function hasMany(Models $relatedModel, string $foreignKey)
+    {
+        $relatedInstance = new $relatedModel();
+        return $relatedInstance->where([$foreignKey, '=', $this->id])->all();
+    }
+
+
+    public function belongsTo(Models $relatedModel, string $foreignKey = "id")
+    {
+        $relatedInstance = new $relatedModel();
+        $foreignKeyValue = $this->$foreignKey;
+        return $relatedInstance->where(['id', '=', $foreignKeyValue])->first();
+    }
+
+    public function belongsToMany(string $relatedModel)
+    {
+        // Déterminer le nom de la table pivot en ordre alphabétique
+        $tables = [$this->table, (new $relatedModel())->table];
+        sort($tables);
+        $pivotTable = implode('_', $tables);
+
+        // Déterminer les noms des colonnes dans la table pivot
+        $columnA = "{$tables[0]}_id";
+        $columnB = "{$tables[1]}_id";
+
+        // Retourner les résultats liés
+        $query = "SELECT {$relatedModel}.* FROM {$relatedModel}
+                  INNER JOIN {$pivotTable} ON {$relatedModel}.id = {$pivotTable}.{$columnB}
+                  WHERE {$pivotTable}.{$columnA} = {$this->id}";
+
+        try {
+            $stmt = Application::$app->db->pdo->query($query);
+            $results = $stmt->fetchAll(\PDO::FETCH_CLASS, $relatedModel);
+        } catch (\PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+            $results = [];
+        }
+
+        return $results;
+    }
+
+    public function attach(string $relatedModel, int $relatedId)
+    {
+        $tables = [$this->table, (new $relatedModel())->table];
+        sort($tables);
+        $pivotTable = implode('_', $tables);
+
+        $columnA = "{$tables[0]}_id";
+        $columnB = "{$tables[1]}_id";
+
+        $query = "INSERT INTO {$pivotTable} ({$columnA}, {$columnB}) VALUES ({$this->id}, {$relatedId})";
+
+        try {
+            Application::$app->db->pdo->exec($query);
+            return true;
+        } catch (\PDOException $e) {
+            echo "Erreur lors de l'attachement : " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function detach(string $relatedModel, int $relatedId)
+    {
+        $tables = [$this->table, (new $relatedModel())->table];
+        sort($tables);
+        $pivotTable = implode('_', $tables);
+
+        $columnA = "{$tables[0]}_id";
+        $columnB = "{$tables[1]}_id";
+
+        $query = "DELETE FROM {$pivotTable} WHERE {$columnA} = {$this->id} AND {$columnB} = {$relatedId}";
+
+        try {
+            Application::$app->db->pdo->exec($query);
+            return true;
+        } catch (\PDOException $e) {
+            echo "Erreur lors du détachement : " . $e->getMessage();
+            return false;
+        }
+    }
 }
