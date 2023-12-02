@@ -7,8 +7,8 @@ use PDO;
 class Models
 {
     protected $table;
-    protected $fillable = [];
-
+    protected array $fillable = [];
+    private array $form_datas = [];
     public static function create(array $data)
     {
         $instance = new static();
@@ -20,21 +20,31 @@ class Models
 
     protected function fill(array $data)
     {
+        foreach (array_keys($data) as $array_key) {
+            if (in_array($array_key, $this->fillable)) {
+                $this->form_datas[] = $array_key;
+            }
+        }
+
         foreach ($data as $key => $value) {
             if (in_array($key, $this->fillable)) {
                 if (is_bool($value)) $value = $value ? 1: 0;
 
-                $this->$key = $value;
+                $this->$key = $value ?? "";
             }
         }
     }
 
     protected function save()
     {
-        $columns = implode(', ', $this->fillable);
-        $values = implode(', ', array_map(function ($key) {
-            return "'" . $this->$key . "'";
-        }, $this->fillable));
+        $columns = implode(', ', $this->form_datas);
+        $values = implode(', ', array_map(function ($value) {
+            if ($this->$value === null) {
+                $this->$value = "NULL";
+            } else {
+                return "'" . $this->$value . "'";
+            }
+        }, $this->form_datas));
 
         $query = "INSERT INTO {$this->table} ({$columns}) VALUES ({$values})";
 

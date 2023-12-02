@@ -26,11 +26,21 @@ class AuthController extends Controller
     public function register_store(Request $request)
     {
         $request->validate([
-            "usernames" => "required",
-            "email" => "unique:app\models\User,email"
+            "firstname" => "required",
+            "lastname" => "required",
+            "email" => "unique:app\models\User,email;required",
+            "password" => "required;min:4"
         ]);
 
-//        var_dump($request->getBody());
+
+        $user = User::create([
+            "email" => strtolower($request->input("email")),
+            "firstname" => $request->input("firstname"),
+            "lastname" => $request->input("lastname"),
+            "password" => password_hash($request->input("password"), PASSWORD_ARGON2ID),
+        ]);
+        var_dump($user);
+        die();
         return;
     }
 }

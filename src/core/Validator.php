@@ -11,6 +11,8 @@ abstract class Validator
         foreach ($rules as $input => $rule) {
             $value = $this->input($input);
 
+            if ($value === null) return $errors;
+
             // Split the rule into individual validation methods
             $validations = explode(';', $rule);
 
@@ -38,8 +40,12 @@ abstract class Validator
                 }
             }
         }
+
         if (sizeof($errors) !== 0) {
-            Application::$app->response->redirect()->back()->with("inputs_errors", $errors);
+            Application::$app->response->redirect()
+                ->back()
+                ->with("inputs_errors", $errors)
+                ->with("inputs_old", $this->getBody());
 
             return $errors;
         }
@@ -130,6 +136,8 @@ abstract class Validator
 
         $class = new $class();
 
-        return $class->where([$col, $value]);
+        $exist = $class->where([$col, $value]) !== false;
+
+        return !$exist;
     }
 }

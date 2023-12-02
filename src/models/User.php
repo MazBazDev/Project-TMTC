@@ -7,7 +7,7 @@ use app\core\Models;
 class User extends Models
 {
     protected $table = "users";
-    protected $fillable = [
+    protected array $fillable = [
         "email",
         "firstname",
         "lastname",
