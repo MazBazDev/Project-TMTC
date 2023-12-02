@@ -9,6 +9,7 @@ class Models
     protected $table;
     protected array $fillable = [];
     private array $form_datas = [];
+
     public static function create(array $data)
     {
         $instance = new static();
@@ -16,6 +17,48 @@ class Models
         $instance->save();
 
         return $instance;
+    }
+
+    public function update(array $data)
+    {
+        $setValues = [];
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $this->fillable)) {
+                $setValues[] = "$key = '" . $value . "'";
+                $this->$key = $value;
+            }
+        }
+
+        $setValues = implode(', ', $setValues);
+
+        $query = "UPDATE {$this->table} SET {$setValues} WHERE id = {$this->id}";
+
+        try {
+            Application::$app->db->pdo->exec($query);
+            return $this;
+        } catch (\PDOException $e) {
+            echo "Erreur de mise à jour dans la base de données : " . $e->getMessage();
+            return null;
+        }
+    }
+
+    public function delete()
+    {
+        if (!$this->id) {
+            // Impossible de supprimer sans identifiant
+            return false;
+        }
+
+        $query = "DELETE FROM {$this->table} WHERE id = {$this->id}";
+
+        try {
+            Application::$app->db->pdo->exec($query);
+            return true;
+        } catch (\PDOException $e) {
+            echo "Erreur de suppression dans la base de données : " . $e->getMessage();
+            return false;
+        }
     }
 
     protected function fill(array $data)
