@@ -13,6 +13,13 @@ if (!function_exists("getFlash")) {
     }
 }
 
+if (!function_exists("setFlash")) {
+    function setFlash($key, $value) {
+        Application::$app->session->setFlash($key, $value);
+    }
+}
+
+
 if (!function_exists("error")) {
     function error($input) {
         $errors = getFlash("inputs_errors");
