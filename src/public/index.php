@@ -16,8 +16,8 @@ $app = new Application(dirname(__DIR__));
 
 $app->router->get('/', [HomeController::class, 'index']);
 
-$app->router->middleware([AuthMiddleware::class])->get('/contact', [ContactController::class, 'index']);
-$app->router->post('/contact', [ContactController::class, 'handleContact']);
+$app->router->middleware([AuthMiddleware::class])->get('/contact/:id/delete/:te', [ContactController::class, 'index']);
+$app->router->post('/contact/:id', [ContactController::class, 'handleContact']);
 
 $app->router->get('/login', [AuthController::class, 'login']);
 $app->router->post('/login', [AuthController::class, 'login_store']);

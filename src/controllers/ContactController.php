@@ -7,14 +7,15 @@ use app\core\Request;
 
 class ContactController
 {
-    public static function index()
+    public static function index($id, $te)
     {
+        var_dump($id);
+
         return Application::$app->router->renderView("contact");
     }
 
-    public static function handleContact(Request $request)
+    public static function handleContact(Request $request, $id)
     {
-        var_dump($request->getBody());
         return "handling submited datas !";
     }
 }

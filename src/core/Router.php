@@ -1,11 +1,7 @@
 <?php
 
 namespace app\core;
-use app\core\twig\Helpers;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
 
 class Router
@@ -14,8 +10,10 @@ class Router
     public Response $response;
     protected array $routes = [];
 
-    private array $middlewares = [];
     private ?array $currentMiddleware = null;
+
+    private array $params = [];
+
 
     /**
      * @param Request $request
@@ -72,12 +70,49 @@ class Router
         return $twig->render($view . ".twig", $params);
     }
 
+    private function matchRoute()
+    {
+        $path = $this->request->getPath();
+        $method = $this->request->method();
+
+        if (isset($this->routes[$method])) {
+            foreach ($this->routes[$method] as $route => $callback) {
+                // Convert :param to regular expression
+                $routePattern = preg_replace_callback('/\/:([^\/]+)/', function ($matches) {
+                    return '/(?<' . $matches[1] . '>[^\/]+)';
+                }, $route);
+                $routePattern = str_replace('/', '\/', $routePattern);
+                $routePattern = '~^' . $routePattern . '$~';
+
+                // Check if the path matches the pattern
+                if (preg_match($routePattern, $path, $matches)) {
+
+                    // Remove the first match (full path)
+                    array_shift($matches);
+
+                    // Store matched parameters
+                    $matches = array_filter($matches, function ($key) {
+                        return !is_numeric($key);
+                    }, ARRAY_FILTER_USE_KEY);
+
+                    $this->params = $matches;
+
+                    return $callback;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+
     public function resolve()
     {
         $path = $this->request->getPath();
         $method = $this->request->method();
 
-        $callback = $this->routes[$method][$path] ?? false;
+        $callback = $this->matchRoute();
 
         if ($callback === false) {
             $this->response->setStatusCode(404);
@@ -101,9 +136,19 @@ class Router
             exit;
         }
 
-        if (is_array($handler)) {
-            $handler[0] = new $handler[0]();
+        if (is_array($callback)) {
+            $handler = $callback[0][0];
+            $method = $callback[0][1];
+
+            if (is_string($handler)) {
+                $handler = new $handler();
+            }
+
+            echo call_user_func_array([$handler, $method],  $this->params);
+
+            exit;
         }
+
 
         echo call_user_func($handler, $this->request);
         exit;
