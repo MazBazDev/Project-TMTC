@@ -4,7 +4,7 @@ namespace app\core;
 
 class Auth
 {
-    private ?Models $user;
+    public ?Models $user;
 
     public function __construct()
     {
@@ -18,14 +18,14 @@ class Auth
         }
     }
 
-    public function check()
+    public static function check()
     {
-        return $this->user();
+        return !empty(Application::$app->auth->user);
     }
 
-    public static function user() : bool
+    public static function user()
     {
-        return Application::$app->user ?? false;
+        return Application::$app->auth->user ?? false;
     }
 
     public function login(Models $user)
