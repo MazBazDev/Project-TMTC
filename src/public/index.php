@@ -6,6 +6,8 @@ use app\controllers\AuthController;
 use app\controllers\ContactController;
 use app\controllers\HomeController;
 use app\core\Application;
+use app\middlewares\AuthMiddleware;
+
 // Fuck deprecated errors
 
 error_reporting(E_ALL ^ E_DEPRECATED);
@@ -14,7 +16,7 @@ $app = new Application(dirname(__DIR__));
 
 $app->router->get('/', [HomeController::class, 'index']);
 
-$app->router->get('/contact', [ContactController::class, 'index']);
+$app->router->middleware([AuthMiddleware::class])->get('/contact', [ContactController::class, 'index']);
 $app->router->post('/contact', [ContactController::class, 'handleContact']);
 
 $app->router->get('/login', [AuthController::class, 'login']);

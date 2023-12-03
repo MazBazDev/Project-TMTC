@@ -14,6 +14,9 @@ class Router
     public Response $response;
     protected array $routes = [];
 
+    private array $middlewares = [];
+    private ?array $currentMiddleware = null;
+
     /**
      * @param Request $request
      * @param Response $response
@@ -24,14 +27,24 @@ class Router
         $this->response = $response;
     }
 
-    public  function get($path, $callback)
+    public function middleware(array $middleware)
     {
-        $this->routes['get'][$path] = $callback;
+        $this->currentMiddleware = $middleware;
+        return $this;
     }
 
-    public  function post($path, $callback)
+    public function get($path, $callback)
     {
-        $this->routes['post'][$path] = $callback;
+        $this->routes['get'][$path] = [$callback, $this->currentMiddleware];
+        $this->currentMiddleware = null;
+        return $this;
+    }
+
+    public function post($path, $callback)
+    {
+        $this->routes['post'][$path] = [$callback, $this->currentMiddleware];
+        $this->currentMiddleware = null;
+        return $this;
     }
 
 
@@ -59,24 +72,6 @@ class Router
         return $twig->render($view . ".twig", $params);
     }
 
-//    protected function layoutContent()
-//    {
-//        ob_start();
-//        include_once Application::$ROOT_DIR."/views/layouts/main.php";
-//        return ob_get_clean();
-//    }
-//
-//    protected function renderOnlyView($view, $params)
-//    {
-//        foreach ($params as $key => $value) {
-//            $$key = $value;
-//        }
-//
-//        ob_start();
-//        include_once Application::$ROOT_DIR."/views/$view.php";
-//        return ob_get_clean();
-//    }
-
     public function resolve()
     {
         $path = $this->request->getPath();
@@ -90,16 +85,27 @@ class Router
             exit;
         }
 
-        if (is_string($callback)) {
-            echo $this->renderView($callback);
+        list($handler, $middlewares) = $callback;
+
+        if (!empty($middlewares)) {
+            foreach ($middlewares as $middleware) {
+                $middlewareInstance = new $middleware();
+                $closure = new Closure();
+                $closure->addMiddleware($middlewareInstance);
+                $closure->next($this->request);
+            }
+        }
+
+        if (is_string($handler)) {
+            echo $this->renderView($handler);
             exit;
         }
 
-        if (is_array($callback)) {
-            $callback[0] = new $callback[0]();
+        if (is_array($handler)) {
+            $handler[0] = new $handler[0]();
         }
 
-        echo call_user_func($callback, $this->request);
+        echo call_user_func($handler, $this->request);
         exit;
     }
 }
