@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\core\Application;
+use app\core\Auth;
 use app\core\Controller;
 use app\core\Request;
 use app\models\User;
@@ -13,9 +15,36 @@ class AuthController extends Controller
         return $this->render("auth.login");
     }
 
-    public function login_store()
+    public function login_store(Request $request)
     {
-        
+
+        $request->validate([
+            "email" => "bail;required;exist:app\models\User,email",
+            "password" => "required",
+        ], [
+            "email" => [
+                "required" => "email is required!!!!!",
+                "exist" => "an user already exist"
+            ]
+        ]);
+
+        $user = User::where(["email", $request->input("email")]);
+
+        if (!password_verify($request->input("password"), $user->password)) {
+            return $this->response
+                ->redirect()
+                ->back()
+                ->with("inputs_errors", [
+                    "password" => [
+                        "Password does not match !"
+                    ]
+                ])
+                ->with("inputs_old", $request->getBody());
+        }
+
+        Application::$app->auth->login($user);
+
+        return $this->response->redirect("/")->with("success", "Logged !");
     }
 
     public function register()
@@ -32,15 +61,23 @@ class AuthController extends Controller
             "password" => "required;min:4"
         ]);
 
-
         $user = User::create([
             "email" => strtolower($request->input("email")),
             "firstname" => $request->input("firstname"),
             "lastname" => $request->input("lastname"),
             "password" => password_hash($request->input("password"), PASSWORD_ARGON2ID),
         ]);
-        var_dump($user);
-        die();
-        return;
+
+        setFlash("success", "registred !");
+        Application::$app->auth->login($user);
+
+        return $this->response->redirect("/")->with("success", "Logged !");
+    }
+
+    public function logout()
+    {
+        Application::$app->auth->logout();
+
+        return $this->response->redirect("/")->with("success", "Lougout !");
     }
 }

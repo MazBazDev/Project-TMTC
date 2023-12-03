@@ -7,6 +7,8 @@ use PDO;
 class Models
 {
     protected $table;
+
+    public $primary_key = "id";
     protected array $fillable = [];
     private array $form_datas = [];
 

@@ -12,6 +12,7 @@ use Symfony\Component\Console\Application as SymfonyConsole;
 class Application
 {
     public static string $ROOT_DIR;
+    public array $config;
     public Router $router;
     public Request $request;
     public Response $response;
@@ -19,7 +20,10 @@ class Application
     public Database $db;
 
     public static Application $app;
-    
+
+    public Auth $auth;
+
+
     public function __construct($rootPath)
     {
         self::$ROOT_DIR = $rootPath;
@@ -28,12 +32,13 @@ class Application
         $dotenv = Dotenv::createImmutable(self::$ROOT_DIR);
         $dotenv->load();
 
+        $this->config = require_once(self::$ROOT_DIR."/config/app.php");
         $this->request = new Request();
         $this->response = new Response();
         $this->session = new Session();
         $this->router = new Router($this->request, $this->response);
-
         $this->db = new Database();
+        $this->auth = new Auth();
     }
 
     public function run()
