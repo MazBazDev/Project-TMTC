@@ -16,6 +16,7 @@ class Router
 
     private array $routeGroups = [];
 
+    private string $prefix = "";
     private string $assetDirectory;
 
 
@@ -43,8 +44,18 @@ class Router
         return $this;
     }
 
+    public function prefix(string $prefix)
+    {
+        $this->prefix = $prefix;
+        return $this;
+    }
+
     private function addRoute($method, $path, $callback)
     {
+        if ($this->prefix != "") {
+            $path = $this->prefix . $path;
+        }
+
         if (!empty($this->routeGroups)) {
             $callback = [$callback, $this->currentMiddleware];
             foreach ($this->routeGroups as $middleware) {
@@ -120,12 +131,12 @@ class Router
                 $routePattern = preg_replace_callback('/\/:([^\/]+)/', function ($matches) {
                     return '/(?<' . $matches[1] . '>[^\/]+)';
                 }, $route);
-                $routePattern = str_replace('/', '\/', $routePattern);
-                $routePattern = '~^' . $routePattern . '$~';
+
+                // Allow zero or one occurrence of / at the end of the route
+                $routePattern = '~^' . rtrim($routePattern, '/') . '\/?$~';
 
                 // Check if the path matches the pattern
                 if (preg_match($routePattern, $path, $matches)) {
-
                     // Remove the first match (full path)
                     array_shift($matches);
 
@@ -143,8 +154,6 @@ class Router
 
         return false;
     }
-
-
 
     public function resolve()
     {

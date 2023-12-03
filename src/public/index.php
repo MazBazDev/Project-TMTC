@@ -10,7 +10,7 @@ use app\middlewares\AuthMiddleware;
 
 $app = new Application(dirname(__DIR__));
 
-$app->router->group([AuthMiddleware::class], function ($router) {
+$app->router->prefix("/dashboard")->group([AuthMiddleware::class], function ($router) {
     $router->get('/', [HomeController::class, 'index']);
     $router->get('/contact/:id/delete/:te', [ContactController::class, 'index']);
     $router->post('/contact/:id', [ContactController::class, 'handleContact']);
