@@ -2,12 +2,16 @@
 
 namespace app\core;
 
+use app\core\commands\MakeAdminCommand;
 use app\core\Commands\MakeMigrationCommand;
 use app\core\commands\MigrateCommand;
 use app\core\commands\Test;
 use app\core\database\Database;
 use Dotenv\Dotenv;
 use Symfony\Component\Console\Application as SymfonyConsole;
+
+// Fuck deprecated errors
+error_reporting(E_ALL ^ E_DEPRECATED);
 
 class Application
 {
@@ -56,8 +60,8 @@ class Application
     {
         $console = new SymfonyConsole('Chef Framework by MazBaz', '1.0.0');
         $console->add(new MakeMigrationCommand());
+        $console->add(new MakeAdminCommand());
         $console->add(new MigrateCommand());
-        $console->add(new Test());
         $console->run();
     }
 }
