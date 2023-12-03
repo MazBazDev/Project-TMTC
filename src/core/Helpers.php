@@ -54,3 +54,9 @@ if (!function_exists("config")) {
         }
     }
 }
+
+if (!function_exists("asset")) {
+    function asset($public_path) {
+        return env("app_url") . "/assets/$public_path";
+    }
+}

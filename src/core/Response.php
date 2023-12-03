@@ -30,4 +30,23 @@ class Response
         Application::$app->session->setFlash($key, $value);
         return $this; // Retourne l'instance de Response pour permettre l'enchaînement des méthodes
     }
+
+    public function serveAsset($filePath)
+    {
+        // Vérifiez que le fichier existe
+        if (file_exists($filePath) && is_file($filePath)) {
+            // Obtenez le type MIME du fichier
+            $mimeType = mime_content_type($filePath);
+
+            // Définissez le type MIME dans les en-têtes de réponse
+            header("Content-Type: $mimeType");
+
+            // Lisez le contenu du fichier et renvoyez-le
+            readfile($filePath);
+            return true;
+        } else {
+            // Si le fichier n'existe pas, retournez une réponse 404
+            return false;
+        }
+    }
 }

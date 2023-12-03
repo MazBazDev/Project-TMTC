@@ -2,5 +2,6 @@
 
 return [
     "userClass" => app\models\User::class,
-    "fakerLocale" => "en_US"
+    "fakerLocale" => "en_US",
+    "assetDir" => "public/assets/",
 ];

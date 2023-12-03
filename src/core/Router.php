@@ -16,6 +16,9 @@ class Router
 
     private array $routeGroups = [];
 
+    private string $assetDirectory;
+
+
     /**
      * @param Request $request
      * @param Response $response
@@ -24,6 +27,7 @@ class Router
     {
         $this->request = $request;
         $this->response = $response;
+        $this->assetDirectory = config("assetDir");
     }
 
     public function group(array $middleware, callable $callback)
@@ -96,6 +100,20 @@ class Router
         $path = $this->request->getPath();
         $method = $this->request->method();
 
+        // Check if it's an asset route
+        if ($method === 'asset') {
+            $assetPath = $this->assetDirectory . '/' . ltrim($path, '/');
+            if (file_exists($assetPath) && is_file($assetPath)) {
+                // Serve the asset directly
+                if (!$this->response->serveAsset($assetPath)) {
+                    $this->response->setStatusCode("404");
+                    echo $this->renderView("errors/404");
+                }
+                exit;
+            }
+        }
+
+
         if (isset($this->routes[$method])) {
             foreach ($this->routes[$method] as $route => $callback) {
                 // Convert :param to regular expression
@@ -130,14 +148,13 @@ class Router
 
     public function resolve()
     {
-        $path = $this->request->getPath();
-        $method = $this->request->method();
-
         $callback = $this->matchRoute();
 
         if ($callback === false) {
             $this->response->setStatusCode(404);
-            echo $this->renderView("errors/404");
+            if ($this->request->method() !== 'asset') {
+                echo $this->renderView("errors/404");
+            }
             exit;
         }
 
