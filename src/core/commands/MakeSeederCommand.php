@@ -2,6 +2,7 @@
 
 namespace app\core\commands;
 
+use app\core\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,16 +50,17 @@ class MakeSeederCommand extends Command
 
     private function getSeederStub(): string
     {
+
         return "<?php
 namespace app\database\seeders;
 
-use app\core\database\Schema;
-use app\core\database\Columns;
+use Faker\Factory;
 
 return new class {
     public function up()
     {
-        
+        \$factory = Factory::create(config('fakerLocale'));
+
     }
 };
 ";

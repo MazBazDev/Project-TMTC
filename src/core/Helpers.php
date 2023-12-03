@@ -42,3 +42,15 @@ if (!function_exists("old")) {
         }
     }
 }
+
+if (!function_exists("config")) {
+    function config($key, $default = "") {
+        $config = Application::$app->config;
+
+        if (isset($config[$key])) {
+            return $config[$key];
+        } else {
+            return $default;
+        }
+    }
+}
