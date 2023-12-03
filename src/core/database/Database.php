@@ -8,9 +8,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Database
 {
     public \PDO $pdo;
+
     public function __construct()
     {
-        $dsn = "mysql:host=" . env("DB_HOST") . ";port=". env("DB_PORT") .";dbname=" . env("DB_DATABASE");
+        $dsn = "mysql:host=" . env("DB_HOST") . ";port=" . env("DB_PORT") . ";dbname=" . env("DB_DATABASE");
 
         $this->pdo = new \PDO(
             $dsn,
@@ -23,46 +24,59 @@ class Database
 
     public function applyMigrations(OutputInterface $output)
     {
-        $this->createMigrationsTable();
+        $this->applyMigrationsOrSeeders('migrations', 'Applied migration', 'migrations', $output);
+    }
 
-        $appliedMigrations = $this->getAppliedMigrations();
+    public function applySeed(OutputInterface $output)
+    {
+        $this->applyMigrationsOrSeeders('seeders', 'Applied seeder', 'seeders', $output);
+    }
 
-        $files = scandir(Application::$ROOT_DIR.'/database/migrations');
+    protected function applyMigrationsOrSeeders($tableName, $successMessage, $directory, OutputInterface $output)
+    {
+        $this->createMigrationsTable($tableName);
 
-        $toApplyMigrations = array_diff($files, $appliedMigrations);
+        $appliedMigrations = $this->getAppliedMigrations($tableName);
 
-        if (sizeof($toApplyMigrations) - 2 === 0) return $output->writeln("Nothing to migrate 😢");
+        $files = scandir(Application::$ROOT_DIR . '/database/' . $directory);
 
+        foreach ($files as $file) {
+            if ($file === "." || $file === "..") continue;
 
-        foreach ($toApplyMigrations as $migration) {
-            if ($migration === "." || $migration === "..") continue;
+            $filePath = Application::$ROOT_DIR . "/database/$directory/$file";
+            $instance = $this->includeMigrationFile($filePath);
 
-            $migrationFilePath = Application::$ROOT_DIR."/database/migrations/".$migration;
-            $migrationInstance = $this->includeMigrationFile($migrationFilePath);
+            if ($instance !== null && !in_array($file, $appliedMigrations)) {
 
-            if ($migrationInstance !== null) {
-                $this->executeMigration($migrationInstance, $output);
-                $this->recordMigration($migration);
+                try {
+                    $this->executeMigration($instance, $output);
+                    $this->recordMigration($tableName, $file);
 
-                $output->writeln("🚀 Applied migration: " . $migration);
+                    $output->writeln("🚀 $successMessage: $file");
+                } catch (\Exception $e) {
+                    $output->writeln("⚠️ Error loading $directory '$file': " . $e->getMessage());
+                }
+
+            } elseif (in_array($file, $appliedMigrations)) {
+                $output->writeln("⚠️ $directory '$file' already applied");
             } else {
-                $output->writeln("⚠️ Error loading migration: " . $migration);
+                $output->writeln("⚠️ Error loading $directory: $file");
             }
         }
     }
 
-    protected function createMigrationsTable()
+    protected function createMigrationsTable($tableName)
     {
-        $this->pdo->exec("CREATE TABLE IF NOT EXISTS migrations (
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS $tableName (
             id INT AUTO_INCREMENT PRIMARY KEY,
             migration VARCHAR(255),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )  ENGINE=INNODB;");
     }
 
-    private function getAppliedMigrations()
+    private function getAppliedMigrations($tableName)
     {
-        $statement = $this->pdo->prepare("SELECT migration FROM migrations");
+        $statement = $this->pdo->prepare("SELECT migration FROM $tableName");
 
         $statement->execute();
 
@@ -80,18 +94,18 @@ class Database
         return null;
     }
 
-    private function executeMigration($migrationInstance, OutputInterface $output)
+    private function executeMigration($instance, OutputInterface $output)
     {
-        if (method_exists($migrationInstance, 'up')) {
-            $migrationInstance->up();
+        if (method_exists($instance, 'up')) {
+            $instance->up();
         } else {
-            $output->writeln("🚨 Missing 'up' method in migration.");
+            throw new \Exception("Missing 'up' method in migration or seeder.");
         }
     }
 
-    private function recordMigration($migration)
+    private function recordMigration($tableName, $migration)
     {
-        $statement = $this->pdo->prepare("INSERT INTO migrations (migration) VALUES (:migration)");
+        $statement = $this->pdo->prepare("INSERT INTO $tableName (migration) VALUES (:migration)");
         $statement->bindValue(':migration', $migration);
         $statement->execute();
     }

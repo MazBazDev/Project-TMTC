@@ -4,7 +4,9 @@ namespace app\core;
 
 use app\core\commands\MakeAdminCommand;
 use app\core\Commands\MakeMigrationCommand;
+use app\core\commands\MakeSeederCommand;
 use app\core\commands\MigrateCommand;
+use app\core\commands\SeedCommand;
 use app\core\commands\Test;
 use app\core\database\Database;
 use Dotenv\Dotenv;
@@ -63,8 +65,14 @@ class Application
     {
         $console = new SymfonyConsole('Chef Framework by MazBaz', '1.0.0');
         $console->add(new MakeMigrationCommand());
-        $console->add(new MakeAdminCommand());
         $console->add(new MigrateCommand());
+
+
+        $console->add(new MakeSeederCommand());
+        $console->add(new SeedCommand());
+
+        $console->add(new MakeAdminCommand());
+
         $console->run();
     }
 }
