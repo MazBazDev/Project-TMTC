@@ -36,6 +36,8 @@ class Application
         $dotenv = Dotenv::createImmutable(self::$ROOT_DIR);
         $dotenv->load();
 
+        date_default_timezone_set(env("APP_TIMEZONE"));
+
         $this->config = require_once(self::$ROOT_DIR."/config/app.php");
         $this->request = new Request();
         $this->response = new Response();
@@ -43,6 +45,7 @@ class Application
         $this->router = new Router($this->request, $this->response);
         $this->db = new Database();
         $this->auth = new Auth();
+
     }
 
     public function run()
