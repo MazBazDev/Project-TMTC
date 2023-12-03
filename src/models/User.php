@@ -15,4 +15,9 @@ class User extends Models
         "admin",
         "password",
     ];
+
+    public function isAdmin() : bool
+    {
+        return $this->admin;
+    }
 }

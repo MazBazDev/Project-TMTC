@@ -4,7 +4,7 @@ namespace app\core;
 
 abstract class Validator
 {
-    private array $messages;
+    private array $messages = [];
 
     public function validate($rules, $messages = []): array
     {
@@ -26,12 +26,10 @@ abstract class Validator
         }
 
         if (sizeof($errors) !== 0) {
-            Application::$app->response->redirect()
+            return Application::$app->response->redirect()
                 ->back()
                 ->with("inputs_errors", $errors)
                 ->with("inputs_old", $this->getBody());
-
-            return $errors;
         }
 
         return $errors;

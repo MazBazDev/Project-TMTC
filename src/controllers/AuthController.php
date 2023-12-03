@@ -3,14 +3,13 @@
 namespace app\controllers;
 
 use app\core\Application;
-use app\core\Auth;
 use app\core\Controller;
 use app\core\Request;
 use app\models\User;
 
 class AuthController extends Controller
 {
-    public function login()
+    public function login(Request $request)
     {
         return $this->render("auth.login");
     }
@@ -24,7 +23,7 @@ class AuthController extends Controller
         ], [
             "email" => [
                 "required" => "email is required!!!!!",
-                "exist" => "an user already exist"
+                "exist" => "User don't exist"
             ]
         ]);
 

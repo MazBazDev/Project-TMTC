@@ -19,6 +19,20 @@ class Response
         return $this; // Retourne l'instance de Response pour permettre l'enchaînement des méthodes
     }
 
+    public function abort_if(bool $bool, $code = 404, $message = "Not found !")
+    {
+        if ($bool) {
+            $this->setStatusCode($code);
+
+            Application::$app->router->renderView("errors", [
+                "code" => $code,
+                "message" => $message,
+            ]);
+
+            exit();
+        }
+    }
+
     public function back()
     {
         header('Location: ' . $_SERVER['HTTP_REFERER']);

@@ -103,7 +103,7 @@ class Router
         }
 
 
-        return $twig->render($view . ".twig", $params);
+        echo $twig->render($view . ".twig", $params);
     }
 
     private function matchRoute()
@@ -116,10 +116,7 @@ class Router
             $assetPath = $this->assetDirectory . '/' . ltrim($path, '/');
             if (file_exists($assetPath) && is_file($assetPath)) {
                 // Serve the asset directly
-                if (!$this->response->serveAsset($assetPath)) {
-                    $this->response->setStatusCode("404");
-                    echo $this->renderView("errors/404");
-                }
+                $this->response->abort_if(!$this->response->serveAsset($assetPath));
                 exit;
             }
         }
@@ -159,13 +156,7 @@ class Router
     {
         $callback = $this->matchRoute();
 
-        if ($callback === false) {
-            $this->response->setStatusCode(404);
-            if ($this->request->method() !== 'asset') {
-                echo $this->renderView("errors/404");
-            }
-            exit;
-        }
+        $this->response->abort_if($callback === false);
 
         list($handler, $middlewares) = $callback;
 
@@ -185,8 +176,7 @@ class Router
         }
 
         if (is_string($handler)) {
-            echo $this->renderView($handler);
-            exit;
+            $this->renderView($handler);
         }
 
         if (is_array($callback)) {
@@ -197,8 +187,7 @@ class Router
                 $handler = new $handler();
             }
 
-            echo call_user_func_array([$handler, $method],  $this->params);
-
+            echo call_user_func_array([$handler, $method], [$this->request, $this->params]);
             exit;
         }
 

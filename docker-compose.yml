@@ -3,7 +3,7 @@ services:
   web:
     build: .
     ports:
-      - "8090:80" # Expose port 8080 on WSL to port 80 in the container
+      - "3000:80" # Expose port 8080 on WSL to port 80 in the container
     volumes:
       - ./src:/var/www/html
   mysql:
