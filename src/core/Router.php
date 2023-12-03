@@ -14,6 +14,7 @@ class Router
 
     private array $params = [];
 
+    private array $routeGroups = [];
 
     /**
      * @param Request $request
@@ -25,23 +26,43 @@ class Router
         $this->response = $response;
     }
 
+    public function group(array $middleware, callable $callback)
+    {
+        $this->currentMiddleware = $middleware;
+        $callback($this);
+        $this->currentMiddleware = null;
+    }
+
     public function middleware(array $middleware)
     {
         $this->currentMiddleware = $middleware;
         return $this;
     }
 
+    private function addRoute($method, $path, $callback)
+    {
+        if (!empty($this->routeGroups)) {
+            $callback = [$callback, $this->currentMiddleware];
+            foreach ($this->routeGroups as $middleware) {
+                $callback[1] = array_merge($callback[1], $middleware);
+            }
+        } else {
+            $callback = [$callback, $this->currentMiddleware];
+        }
+
+        $this->routes[$method][$path] = $callback;
+        $this->currentMiddleware = null;
+    }
+
     public function get($path, $callback)
     {
-        $this->routes['get'][$path] = [$callback, $this->currentMiddleware];
-        $this->currentMiddleware = null;
+        $this->addRoute('get', $path, $callback);
         return $this;
     }
 
     public function post($path, $callback)
     {
-        $this->routes['post'][$path] = [$callback, $this->currentMiddleware];
-        $this->currentMiddleware = null;
+        $this->addRoute('post', $path, $callback);
         return $this;
     }
 
@@ -122,6 +143,12 @@ class Router
 
         list($handler, $middlewares) = $callback;
 
+        if (!empty($this->routeGroups)) {
+            foreach ($this->routeGroups as $groupMiddleware) {
+                $middlewares = array_merge($middlewares, $groupMiddleware);
+            }
+        }
+
         if (!empty($middlewares)) {
             foreach ($middlewares as $middleware) {
                 $middlewareInstance = new $middleware();
@@ -148,7 +175,6 @@ class Router
 
             exit;
         }
-
 
         echo call_user_func($handler, $this->request);
         exit;

@@ -14,10 +14,14 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 
 $app = new Application(dirname(__DIR__));
 
-$app->router->get('/', [HomeController::class, 'index']);
+$app->router->group([AuthMiddleware::class], function ($router) {
+    $router->get('/', [HomeController::class, 'index']);
+    $router->get('/contact/:id/delete/:te', [ContactController::class, 'index']);
+    $router->post('/contact/:id', [ContactController::class, 'handleContact']);
+});
 
-$app->router->middleware([AuthMiddleware::class])->get('/contact/:id/delete/:te', [ContactController::class, 'index']);
-$app->router->post('/contact/:id', [ContactController::class, 'handleContact']);
+//$app->router->middleware([AuthMiddleware::class])->get('/contact/:id/delete/:te', [ContactController::class, 'index']);
+//$app->router->post('/contact/:id', [ContactController::class, 'handleContact']);
 
 $app->router->get('/login', [AuthController::class, 'login']);
 $app->router->post('/login', [AuthController::class, 'login_store']);
