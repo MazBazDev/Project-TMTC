@@ -20,6 +20,7 @@ class Router
     public array $associatedRoutes = [];
     private array $currentRouteGroups = [];
 
+    private array $parentMiddlewares = [];
 
     /**
      * @param Request $request
@@ -35,16 +36,27 @@ class Router
     public function group(array $middleware, callable $callback)
     {
         $parentGroup = $this->currentRouteGroups;
+
+        // Inclure les middlewares des groupes parents
+        $middleware = array_merge($middleware, $this->parentMiddlewares);
+
         if ($this->currentName !== null) {
             $this->currentRouteGroups[] = $this->currentName;
         }
 
         $this->currentMiddleware = $middleware;
+
+        // Inclure les middlewares des groupes parents pour les groupes imbriqués
+        $this->parentMiddlewares = array_merge($this->parentMiddlewares, $this->currentMiddleware);
+
         $callback($this);
 
         $this->currentMiddleware = null;
         $this->currentName = null;
         $this->currentRouteGroups = $parentGroup;
+
+        // Restaurer les middlewares des groupes parents après la sortie du groupe
+        $this->parentMiddlewares = array_slice($this->parentMiddlewares, 0, -count($middleware));
 
         return $this;
     }
@@ -88,13 +100,16 @@ class Router
             $this->associatedRoutes[$this->currentName] = ($path !== '/' ? rtrim($path, '/') : $path);
         }
 
+        // Inclure les middlewares des groupes parents pour la route
+        $middlewares = array_merge($this->currentMiddleware ?? [], $this->parentMiddlewares);
+
         if (!empty($this->routeGroups)) {
-            $callback = [$callback, $this->currentMiddleware];
+            $callback = [$callback, $middlewares];
             foreach ($this->routeGroups as $middleware) {
                 $callback[1] = array_merge($callback[1], $middleware);
             }
         } else {
-            $callback = [$callback, $this->currentMiddleware];
+            $callback = [$callback, $middlewares];
         }
 
         $this->routes[$method][$path] = $callback;
@@ -199,7 +214,7 @@ class Router
 
         if (!empty($this->routeGroups)) {
             foreach ($this->routeGroups as $groupMiddleware) {
-                $middlewares = array_merge($middlewares, $groupMiddleware);
+                $this->parentMiddlewares = array_merge($this->parentMiddlewares, $groupMiddleware);
             }
         }
 
