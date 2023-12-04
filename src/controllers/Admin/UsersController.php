@@ -12,6 +12,7 @@ class UsersController extends Controller
     public function index()
     {
         $users = User::all();
+        return $this->response->redirect()->back()->with("success", "test");
 
         return $this->render("admin.users.index", [
             "users" => $users,

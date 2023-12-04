@@ -20,6 +20,8 @@
       <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/service-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/src/vendor/symfony/string" />
       <excludeFolder url="file://$MODULE_DIR$/src/vendor/vlucas/phpdotenv" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/fakerphp/faker" />
+      <excludeFolder url="file://$MODULE_DIR$/src/vendor/twig/twig" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
