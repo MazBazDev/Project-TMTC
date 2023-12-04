@@ -60,3 +60,19 @@ if (!function_exists("asset")) {
         return env("app_url") . "/assets/$public_path";
     }
 }
+
+if (!function_exists("route")) {
+    function route($short, $params = []) {
+        $associatedRoutes = Application::$app->router->associatedRoutes;
+        var_dump($associatedRoutes);
+        if (array_key_exists($short, $associatedRoutes)) {
+            $url = env("APP_URL") . $associatedRoutes[$short];
+
+            foreach ($params as $key => $value) {
+                $url = str_replace(":$key", $value, $url);
+            }
+            return $url;
+        }
+        return null;
+    }
+}

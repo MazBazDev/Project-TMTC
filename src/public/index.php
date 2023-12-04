@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use app\controllers\Admin\AdminController;
+use app\controllers\Admin\UsersController;
 use app\controllers\AuthController;
 use app\controllers\HomeController;
 use app\core\Application;
@@ -15,7 +16,7 @@ $app = new Application(dirname(__DIR__));
 $app->router->get('/', [HomeController::class, 'index']);
 
 $app->router->group([IsNotAuth::class], function ($router) {
-    $router->get('/login', [AuthController::class, 'login']);
+    $router->name("hoho")->get('/login', [AuthController::class, 'login']);
     $router->post('/login', [AuthController::class, 'login_store']);
 
     $router->get('/register', [AuthController::class, 'register']);
@@ -28,8 +29,14 @@ $app->router->group([IsAuth::class], function ($router) {
 });
 
 
-$app->router->prefix("/dashboard")->group([IsAuth::class, IsAdmin::class], function ($router) {
-    $router->get('/', [AdminController::class, 'index']);
+$app->router->name("dashboard")->prefix("/dashboard")->group([IsAuth::class, IsAdmin::class], function ($router) {
+    $router->name("index")->get('/', [AdminController::class, 'index']);
+    $router->name("test")->get('/test/:id', [AdminController::class, 'index']);
 });
+
+$app->router->prefix("/dashboard/users")->group([IsAuth::class, IsAdmin::class], function ($router) {
+    $router->get('/', [UsersController::class, 'index']);
+});
+
 
 $app->run();

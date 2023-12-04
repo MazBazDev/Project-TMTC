@@ -1,6 +1,7 @@
 <?php
 
 namespace app\core;
+
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -11,14 +12,13 @@ class Router
     protected array $routes = [];
 
     private ?array $currentMiddleware = null;
-
     private array $params = [];
-
     private array $routeGroups = [];
-
     private string $prefix = "";
     private string $assetDirectory;
-
+    private ?string $currentName = null;
+    private ?string $currentGroup = null;
+    public array $associatedRoutes = [];
 
     /**
      * @param Request $request
@@ -33,9 +33,11 @@ class Router
 
     public function group(array $middleware, callable $callback)
     {
+        $this->currentGroup = $this->currentName;
         $this->currentMiddleware = $middleware;
         $callback($this);
         $this->currentMiddleware = null;
+        return $this;
     }
 
     public function middleware(array $middleware)
@@ -50,10 +52,21 @@ class Router
         return $this;
     }
 
+    public function name(string $name)
+    {
+        $groupName = $this->currentGroup !== null ? $this->currentGroup . '.' : '';
+        $this->currentName = $groupName . $name;
+        return $this;
+    }
+
     private function addRoute($method, $path, $callback)
     {
         if ($this->prefix != "") {
             $path = $this->prefix . $path;
+        }
+
+        if ($this->currentName !== null) {
+            $this->associatedRoutes[$this->currentName] = ($path !== '/' ? rtrim($path, '/') : $path);
         }
 
         if (!empty($this->routeGroups)) {
@@ -67,6 +80,7 @@ class Router
 
         $this->routes[$method][$path] = $callback;
         $this->currentMiddleware = null;
+        $this->currentName = null;
     }
 
     public function get($path, $callback)
@@ -81,7 +95,6 @@ class Router
         return $this;
     }
 
-
     public function renderView($view, $params = [])
     {
         $loader = new FilesystemLoader(Application::$ROOT_DIR . "/views");
@@ -90,7 +103,6 @@ class Router
         // Include the helper file
         require_once Application::$ROOT_DIR . "/core/Helpers.php";
 
-
         // Get all declared functions
         $functions = get_defined_functions();
 
@@ -98,10 +110,8 @@ class Router
         foreach ($functions['user'] as $function) {
             // Use lcfirst to make the first letter lowercase
             $twigFunctionName = lcfirst($function);
-
             $twig->addFunction(new \Twig\TwigFunction($twigFunctionName, $function));
         }
-
 
         echo $twig->render($view . ".twig", $params);
     }
@@ -120,7 +130,6 @@ class Router
                 exit;
             }
         }
-
 
         if (isset($this->routes[$method])) {
             foreach ($this->routes[$method] as $route => $callback) {
@@ -143,7 +152,6 @@ class Router
                     }, ARRAY_FILTER_USE_KEY);
 
                     $this->params = $matches;
-
                     return $callback;
                 }
             }
@@ -155,7 +163,6 @@ class Router
     public function resolve()
     {
         $callback = $this->matchRoute();
-
         $this->response->abort_if($callback === false);
 
         list($handler, $middlewares) = $callback;
