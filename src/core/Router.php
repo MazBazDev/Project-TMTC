@@ -17,8 +17,9 @@ class Router
     private string $prefix = "";
     private string $assetDirectory;
     private ?string $currentName = null;
-    private ?string $currentGroup = null;
     public array $associatedRoutes = [];
+    private array $currentRouteGroups = [];
+
 
     /**
      * @param Request $request
@@ -33,12 +34,22 @@ class Router
 
     public function group(array $middleware, callable $callback)
     {
-        $this->currentGroup = $this->currentName;
+        $parentGroup = $this->currentRouteGroups;
+
+        if ($this->currentName !== null) {
+            $this->currentRouteGroups[] = $this->currentName;
+        }
+
         $this->currentMiddleware = $middleware;
         $callback($this);
+
         $this->currentMiddleware = null;
+        $this->currentName = null;
+        $this->currentRouteGroups = $parentGroup;
+
         return $this;
     }
+
 
     public function middleware(array $middleware)
     {
@@ -54,10 +65,24 @@ class Router
 
     public function name(string $name)
     {
-        $groupName = $this->currentGroup !== null ? $this->currentGroup . '.' : '';
-        $this->currentName = $groupName . $name;
+        $fullName = $name;
+        if (!empty($this->currentRouteGroups)) {
+
+            $fullName = implode('.', $this->currentRouteGroups) . '.' . $name;
+        }
+
+        if ($this->currentName !== null) {
+            $this->currentName .= '.' . $name;
+        } else {
+            $this->currentName = $fullName;
+        }
+
         return $this;
     }
+
+
+
+
 
     private function addRoute($method, $path, $callback)
     {

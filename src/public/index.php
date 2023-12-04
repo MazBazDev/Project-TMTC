@@ -28,11 +28,27 @@ $app->router->group([IsAuth::class], function ($router) {
 
 });
 
+$app->router->name("parent")->group([], function ($router) {
+    $router->name("index")->get('/', [HomeController::class, 'index']);
 
-$app->router->name("dashboard")->prefix("/dashboard")->group([IsAuth::class, IsAdmin::class], function ($router) {
-    $router->name("index")->get('/', [AdminController::class, 'index']);
-    $router->name("test")->get('/test/:id', [AdminController::class, 'index']);
+    $router->name("child")->group([/* middleware */], function ($router) {
+        $router->name("dashboard")->get('/dashboard', [DashboardController::class, 'index']);
+
+        $router->name("secchild")->group([/* middleware */], function ($router) {
+            $router->name("admin")->get('/admin', [AdminController::class, 'index']);
+            // ... d'autres routes dans le groupe d'administration
+        });
+    });
 });
+//$app->router->name("dashboard")->prefix("/dashboard")->group([IsAuth::class, IsAdmin::class], function ($router) {
+//    $router->name("index")->get('/', [AdminController::class, 'index']);
+//    $router->name("test")->get('/test/:id', [AdminController::class, 'index']);
+//
+//    $router->name("dashboard2")->prefix("/dashboardq")->group([IsAuth::class, IsAdmin::class], function ($routers) {
+//        $routers->name("index")->get('/', [AdminController::class, 'index']);
+//        $routers->name("test")->get('/test/:id', [AdminController::class, 'index']);
+//    });
+//});
 
 $app->router->prefix("/dashboard/users")->group([IsAuth::class, IsAdmin::class], function ($router) {
     $router->get('/', [UsersController::class, 'index']);
