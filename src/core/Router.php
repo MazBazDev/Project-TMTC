@@ -35,7 +35,6 @@ class Router
     public function group(array $middleware, callable $callback)
     {
         $parentGroup = $this->currentRouteGroups;
-
         if ($this->currentName !== null) {
             $this->currentRouteGroups[] = $this->currentName;
         }
@@ -67,8 +66,7 @@ class Router
     {
         $fullName = $name;
         if (!empty($this->currentRouteGroups)) {
-
-            $fullName = implode('.', $this->currentRouteGroups) . '.' . $name;
+            $fullName = end($this->currentRouteGroups) . '.' . $name;
         }
 
         if ($this->currentName !== null) {
