@@ -71,7 +71,6 @@ class Application
         $console->add(new SeedCommand());
 
         $console->add(new MakeAdminCommand());
-        $console->add(new RouteListCommand());
         $console->run();
     }
 }
