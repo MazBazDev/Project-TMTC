@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
 
@@ -19,6 +19,8 @@
 
     <!-- Custom styles for this template-->
     <link href="{{ asset("admin/css/sb-admin-2.min.css") }}" rel="stylesheet">
+
+    <script src="{{ asset("admin/vendor/notiflix/dist/notiflix-aio-3.2.6.min.js") }}"></script>
 
     {% block scripts %}{% endblock %}
 
@@ -208,6 +210,24 @@
 
 {% block footer_scripts %}{% endblock %}
 
+<script>
+    {% if getflash("success")  %}
+        Notiflix.Notify.success("{{ getflash("success") }}");
+    {% endif %}
+
+    {% if getflash("warning")  %}
+        Notiflix.Notify.warning("{{ getflash("warning") }}");
+    {% endif %}
+
+    {% if getflash("failure")  %}
+
+    Notiflix.Notify.failure("{{ getflash("failure") }}");
+    {% endif %}
+
+    {% if getflash("info")  %}
+        Notiflix.Notify.info("{{ getflash("info") }}");
+    {% endif %}
+</script>
 </body>
 
 </html>
