@@ -213,7 +213,8 @@ class Router
                 $handler = new $handler();
             }
 
-            echo call_user_func_array([$handler, $method], [$this->request, $this->params]);
+
+            echo call_user_func_array([$handler, $method], $this->params);
             exit;
         }
 

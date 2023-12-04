@@ -25,10 +25,14 @@ class UsersController extends Controller
 
     public function show($id)
     {
+        $user = $this->getUserById($id);
 
+        return $this->render("admin.users.show", [
+            "user" => $user
+        ]);
     }
 
-    public function update(Request $request, $id)
+    public function update($id)
     {
 
         return Application::$app->response->redirect()->back()->with("success", "User updated !");
@@ -43,7 +47,7 @@ class UsersController extends Controller
     }
 
     private function getUserById($id) : User {
-        $user = User::where(["id", $id]) ?? false;
+        $user = User::where(["id", "=", $id]) ?? false;
 
         Application::$app->response->abort_if(!$user);
 
