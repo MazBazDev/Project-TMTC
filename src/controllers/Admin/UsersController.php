@@ -11,8 +11,6 @@ class UsersController extends Controller
 {
     public function index()
     {
-        var_dump(Application::$app->router->route("dashboard.index", ["name" => "louis"]));
-        die();
         $users = User::all();
 
         return $this->render("admin.users.index", [

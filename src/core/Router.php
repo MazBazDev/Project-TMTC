@@ -59,7 +59,7 @@ class Router
 
     public function prefix(string $prefix)
     {
-        $this->prefix = $prefix;
+        $this->prefix .= $prefix;
         return $this;
     }
 
@@ -79,10 +79,6 @@ class Router
 
         return $this;
     }
-
-
-
-
 
     private function addRoute($method, $path, $callback)
     {
