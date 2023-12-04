@@ -64,7 +64,7 @@ if (!function_exists("asset")) {
 if (!function_exists("route")) {
     function route($short, $params = []) {
         $associatedRoutes = Application::$app->router->associatedRoutes;
-        var_dump($associatedRoutes);
+
         if (array_key_exists($short, $associatedRoutes)) {
             $url = env("APP_URL") . $associatedRoutes[$short];
 
