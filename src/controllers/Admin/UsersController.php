@@ -12,7 +12,6 @@ class UsersController extends Controller
     public function index()
     {
         $users = User::all();
-        return $this->response->redirect()->back()->with("success", "test");
 
         return $this->render("admin.users.index", [
             "users" => $users,
@@ -35,14 +34,13 @@ class UsersController extends Controller
 
     public function update($id)
     {
-
+        var_dump($this->request->method());
+        die();
         return Application::$app->response->redirect()->back()->with("success", "User updated !");
     }
 
     public function delete($id) {
-        $user = $this->getUserById($id);
-
-        $user->delete();
+//        $user = $this->getUserById($id);
 
         return Application::$app->response->redirect()->back()->with("success", "User deleted !");
     }

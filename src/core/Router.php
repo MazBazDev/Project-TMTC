@@ -114,6 +114,18 @@ class Router
         return $this;
     }
 
+    public function delete($path, $callback)
+    {
+        $this->addRoute('delete', $path, $callback);
+        return $this;
+    }
+
+    public function patch($path, $callback)
+    {
+        $this->addRoute('patch', $path, $callback);
+        return $this;
+    }
+
     public function renderView($view, $params = [])
     {
         $loader = new FilesystemLoader(Application::$ROOT_DIR . "/views");
@@ -183,7 +195,6 @@ class Router
     {
         $callback = $this->matchRoute();
         $this->response->abort_if($callback === false);
-
         list($handler, $middlewares) = $callback;
 
         if (!empty($this->routeGroups)) {

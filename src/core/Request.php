@@ -18,6 +18,10 @@ class Request extends Validator
 
     public function method()
     {
+        if (isset($_POST["_method"])) {
+            return strtolower($_POST["_method"]);
+        }
+
         return strtolower($_SERVER['REQUEST_METHOD']);
     }
 
@@ -31,20 +35,32 @@ class Request extends Validator
         return $this->method() === "post";
     }
 
+    public function isDelete()
+    {
+        return $this->method() === "delete";
+    }
+
+    public function isPatch()
+    {
+        return $this->method() === "patch";
+    }
+
     public function getBody()
     {
         $body = [];
-        if ($this->method() === 'get') {
+
+        if ($this->isGet()) {
             foreach ($_GET as $key => $value) {
                 $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             }
         }
 
-        if ($this->method() === 'post') {
+        if ($this->isPost() || $this->isDelete() || $this->isPatch()) {
             foreach ($_POST as $key => $value) {
                 $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             }
         }
+
         return $body;
     }
 

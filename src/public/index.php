@@ -35,6 +35,7 @@ $app->router->group([IsAuth::class], function (Router $router) {
             $router->name("store")->post('/', [UsersController::class, 'store']);
             $router->name("show")->get('/:id', [UsersController::class, 'show']);
             $router->name("update")->post('/:id', [UsersController::class, 'update']);
+            $router->name("delete")->delete('/:id', [UsersController::class, 'delete']);
         });
     });
 });
