@@ -38,6 +38,11 @@ class Auth
         return Application::$app->auth->user ?? false;
     }
 
+    public static function isAdmin() : bool
+    {
+        return Application::$app->auth->user->isAdmin();
+    }
+
     public function login(User $user)
     {
         $this->user = $user;

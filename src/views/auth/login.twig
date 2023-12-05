@@ -1,26 +1,46 @@
 {% extends "layouts/main.twig" %}
 
+{% block title %} Login {% endblock %}
+
 {% block content %}
+
     <H1>Login</H1>
 
-    <form action="" method="post">
+    <form action="{{ route("login.store") }}" method="post">
         <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="text" class="form-control" name="email" value="{{ old("email", "email@email.com") }}">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ old("email", "email@email.com") }}">
 
             {% if error("email") %}
-                <p class="help-block">{{ error("email") }}</p>
+                <div class="invalid-feedback d-block">{{ error("email") }}</div>
             {% endif %}
-
         </div>
+
         <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="text" class="form-control" name="password" value="password">
-            {% if error("password") %}
-                <p class="help-block">{{ error("password") }}</p>
-            {% endif %}
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" value="password">
 
+            {% if error("password") %}
+                <div class="invalid-feedback d-block">{{ error("password") }}</div>
+            {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a href="{{ route("register") }}">You do not have an account ?</a>
+
     </form>
 {% endblock %}
+
+
+{% block styles %}
+
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
+
+{% block footer_scripts %}
+
+{% endblock %}
+

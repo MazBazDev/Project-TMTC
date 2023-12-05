@@ -1,6 +1,7 @@
 <?php
 
 use app\core\Application;
+use app\core\Auth;
 
 if (!function_exists("env")) {
     function env($key, $default = null) {
@@ -91,5 +92,11 @@ if (!function_exists("method")) {
     function method(string $type)
     {
         return new \Twig\Markup('<input name="_method" type="hidden" value="' . $type .'" />', 'UTF-8');
+    }
+}
+
+if (!function_exists("auth")) {
+    function auth() {
+        return new Auth();
     }
 }

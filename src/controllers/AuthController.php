@@ -77,4 +77,9 @@ class AuthController extends Controller
 
         return $this->response->redirect("home")->with("success", "Lougout !");
     }
+
+    public function profile()
+    {
+        
+    }
 }

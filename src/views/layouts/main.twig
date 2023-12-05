@@ -3,9 +3,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+
+    <title>{{ env("APP_NAME") }} | {{ block("title") }}</title>
+
+    <link href="{{ asset("admin/vendor/fontawesome-free/css/all.min.css") }}" rel="stylesheet" type="text/css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <script src="{{ asset("admin/vendor/notiflix/dist/notiflix-aio-3.2.6.min.js") }}"></script>
+
+    {% block scripts %}{% endblock %}
+
+    {% block styles %}{% endblock %}
 </head>
+
 <header>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
@@ -22,21 +33,88 @@
                         <a class="nav-link active" aria-current="page" href="/contact">Contact</a>
                     </li>
                 </ul>
+
+                <!-- Avatar and Dropdown -->
+                {% if auth().check() %}
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ auth().user().profile_picture }}" alt="Avatar" class="avatar img-fluid rounded-circle">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                {% if auth().user().isAdmin() %}
+                                    <li><a class="dropdown-item" href="{{ route("dashboard.index") }}">Admin</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><button class="dropdown-item btn btn-link" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button></li>
+                            </ul>
+                        </li>
+                    </ul>
+                {% endif %}
             </div>
         </div>
     </nav>
 </header>
-<body>
 
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="alert success">
+            {{ getflash("success") }}
 
-<div class="container">
-    <div class="alert success">
-        {{ getflash("success") }}
-
+        </div>
+        {% block content %}{% endblock %}
     </div>
-    {% block content %}{% endblock %}
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="logoutModalLabel">Ready to Leave?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+
+                    <form action="{{ route("logout") }}" method="post">
+                        <button class="btn btn-primary" type="submit" >Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <div class="col-md-4 d-flex align-items-center">
+            <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+                <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+            </a>
+            <span class="mb-3 mb-md-0 text-body-secondary">Copyright &copy; {{ env("APP_NAME") }} {{ "now"|date("Y") }}</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    {% block footer_scripts %}{% endblock %}
+
+    <script>
+        {% if getflash("success")  %}
+        Notiflix.Notify.success("{{ getflash("success") }}");
+        {% endif %}
+
+        {% if getflash("warning")  %}
+        Notiflix.Notify.warning("{{ getflash("warning") }}");
+        {% endif %}
+
+        {% if getflash("failure")  %}
+
+        Notiflix.Notify.failure("{{ getflash("failure") }}");
+        {% endif %}
+
+        {% if getflash("info")  %}
+        Notiflix.Notify.info("{{ getflash("info") }}");
+        {% endif %}
+    </script>
 </body>
 </html>
