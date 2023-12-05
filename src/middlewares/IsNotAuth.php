@@ -13,7 +13,7 @@ class IsNotAuth implements Middleware
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            return Application::$app->response->redirect("/");
+            return Application::$app->response->redirect("home");
         }
         
         return $next->next($request);

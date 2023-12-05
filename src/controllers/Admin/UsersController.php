@@ -18,9 +18,30 @@ class UsersController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create()
+    {
+        return $this->render("admin.users.create");
+    }
+
+    public function store()
     {
 
+        $this->request->validate([
+            "firstname" => "required",
+            "lastname" => "required",
+            "email" => "unique:app\models\User,email;required",
+            "password" => "required;min:4",
+        ]);
+
+        $user = User::create([
+            "email" => strtolower($this->request->input("email")),
+            "firstname" => $this->request->input("firstname"),
+            "lastname" => $this->request->input("lastname"),
+            "password" => password_hash($this->request->input("password"), PASSWORD_ARGON2ID),
+            "admin" => $this->request->has("admin")
+        ]);
+
+        return $this->response->redirect("dashboard.users.show", ["id" => $user->id])->with("success", "User created !");
     }
 
     public function show($id)
@@ -34,13 +55,36 @@ class UsersController extends Controller
 
     public function update($id)
     {
-        var_dump($this->request->method());
-        die();
+        $user = $this->getUserById($id);
+
+        $this->request->validate([
+            "firstname" => "required",
+            "lastname" => "required",
+            "email" => "required",
+        ]);
+
+        if ($user->email !== $this->request->input("email")) {
+            $this->request->validate([
+                "email" => "unique:app\models\User,email",
+            ], [
+                "email" => [
+                    "unique" => "Email already exist for an other user !"
+                ]
+            ]);
+        }
+
+        $user->update([
+            "firstname" => $this->request->input("firstname"),
+            "lastname" => $this->request->input("lastname"),
+            "email" => $this->request->input("email"),
+        ]);
+
         return Application::$app->response->redirect()->back()->with("success", "User updated !");
     }
 
     public function delete($id) {
-//        $user = $this->getUserById($id);
+        $user = $this->getUserById($id);
+        $user->delete();
 
         return Application::$app->response->redirect()->back()->with("success", "User deleted !");
     }

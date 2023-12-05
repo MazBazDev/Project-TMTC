@@ -4,20 +4,18 @@ namespace app\controllers;
 
 use app\core\Application;
 use app\core\Controller;
-use app\core\Request;
 use app\models\User;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login()
     {
         return $this->render("auth.login");
     }
 
-    public function login_store(Request $request)
+    public function login_store()
     {
-
-        $request->validate([
+        $this->request->validate([
             "email" => "bail;required;exist:app\models\User,email",
             "password" => "required",
         ], [
@@ -27,9 +25,9 @@ class AuthController extends Controller
             ]
         ]);
 
-        $user = User::where(["email", $request->input("email")]);
+        $user = User::where(["email", $this->request->input("email")]);
 
-        if (!password_verify($request->input("password"), $user->password)) {
+        if (!password_verify($this->request->input("password"), $user->password)) {
             return $this->response
                 ->redirect()
                 ->back()
@@ -38,12 +36,12 @@ class AuthController extends Controller
                         "Password does not match !"
                     ]
                 ])
-                ->with("inputs_old", $request->getBody());
+                ->with("inputs_old", $this->request->getBody());
         }
 
         Application::$app->auth->login($user);
 
-        return $this->response->redirect("/")->with("success", "Logged !");
+        return $this->response->redirect("home")->with("success", "Logged !");
     }
 
     public function register()
@@ -51,9 +49,9 @@ class AuthController extends Controller
         return $this->render("auth.register");
     }
 
-    public function register_store(Request $request)
+    public function register_store()
     {
-        $request->validate([
+        $this->request->validate([
             "firstname" => "required",
             "lastname" => "required",
             "email" => "unique:app\models\User,email;required",
@@ -61,22 +59,22 @@ class AuthController extends Controller
         ]);
 
         $user = User::create([
-            "email" => strtolower($request->input("email")),
-            "firstname" => $request->input("firstname"),
-            "lastname" => $request->input("lastname"),
-            "password" => password_hash($request->input("password"), PASSWORD_ARGON2ID),
+            "email" => strtolower($this->request->input("email")),
+            "firstname" => $this->request->input("firstname"),
+            "lastname" => $this->request->input("lastname"),
+            "password" => password_hash($this->request->input("password"), PASSWORD_ARGON2ID),
         ]);
 
         setFlash("success", "registred !");
         Application::$app->auth->login($user);
 
-        return $this->response->redirect("/")->with("success", "Logged !");
+        return $this->response->redirect("home")->with("success", "Logged !");
     }
 
     public function logout()
     {
         Application::$app->auth->logout();
 
-        return $this->response->redirect("/")->with("success", "Lougout !");
+        return $this->response->redirect("home")->with("success", "Lougout !");
     }
 }

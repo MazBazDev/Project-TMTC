@@ -10,13 +10,33 @@ class Response
         http_response_code($code);
     }
 
-    public function redirect(string $url = null)
+//    public function redirect(string $url = null)
+//    {
+//        var_dump($url);
+//        if ($url !== null) {
+//            header("Location: " . $url);
+//        }
+//
+//        return $this; // Retourne l'instance de Response pour permettre l'enchaînement des méthodes
+//    }
+
+    public function redirect(?string $short = null, ?array $params = [])
     {
-        if ($url !== null) {
-            header("Location: " . $url);
+        if ($short !== null) {
+            $associatedRoutes = Application::$app->router->associatedRoutes;
+
+            if (array_key_exists($short, $associatedRoutes)) {
+                $url = $associatedRoutes[$short];
+
+                foreach ($params as $key => $value) {
+                    $url = str_replace(":$key", $value, $url);
+                }
+
+                header("Location: " . $url);
+            }
         }
 
-        return $this; // Retourne l'instance de Response pour permettre l'enchaînement des méthodes
+        return $this;
     }
 
     public function abort_if(bool $bool, $code = 404, $message = "Not found !")

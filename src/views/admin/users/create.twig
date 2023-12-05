@@ -1,6 +1,6 @@
 {% extends "layouts/admin.twig" %}
 
-{% block title %} #{{ user.id }} | {{ user.firstname }} {% endblock %}
+{% block title %} Create user {% endblock %}
 
 {% block content %}
     <div class="mb-3">
@@ -8,14 +8,12 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form method="post" action="{{ route("dashboard.users.update", {'id': user.id}) }}" class="mb-3">
-                {{ method("patch") }}
-
+            <form method="post" action="{{ route("dashboard.users.store") }}" class="mb-3">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="firstname">First name</label>
-                            <input type="text" class="form-control" id="firstname" name="firstname" value="{{ old("firstname", user.firstname) }}">
+                            <input type="text" class="form-control" id="firstname" name="firstname" value="{{ old("firstname") }}">
 
                             {% if error("firstname") %}
                                 <div class=invalid-feedback">{{ error("firstname") }}</div>
@@ -25,7 +23,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="lastname">Last name</label>
-                            <input type="text" class="form-control" id="lastname" name="lastname" value="{{ old("lastname", user.lastname) }}">
+                            <input type="text" class="form-control" id="lastname" name="lastname" value="{{ old("lastname") }}">
 
                             {% if error("lastname") %}
                                 <div class=invalid-feedback">{{ error("lastname") }}</div>
@@ -35,22 +33,35 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="{{ old("email", user.email) }}">
+                            <input type="email" class="form-control" id="email" name="email" value="{{ old("email") }}">
 
                             {% if error("email") %}
                                 <div class=invalid-feedback">{{ error("email") }}</div>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" value="{{ old("password") }}">
+
+                            {% if error("password") %}
+                                <div class=invalid-feedback">{{ error("password") }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="admin" name="admin" {{ checked("admin") }} >
+                            <label class="custom-control-label" for="admin">Admin</label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
                         <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
                     </div>
                 </div>
-            </form>
-
-            <form method="post" action="{{ route('dashboard.users.delete', {'id': user.id}) }}">
-                <input name="_method" type="hidden" value="delete" />
-                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Selete</button>
             </form>
         </div>
     </div>

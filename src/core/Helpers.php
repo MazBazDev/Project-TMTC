@@ -43,6 +43,16 @@ if (!function_exists("old")) {
     }
 }
 
+if (!function_exists("checked")) {
+    function checked($input, bool $default = true) {
+        $oldDatas = getFlash("inputs_old");
+
+        return isset($oldDatas[$input]) && $oldDatas[$input] ? 'checked' : '';
+    }
+}
+
+
+
 if (!function_exists("config")) {
     function config($key, $default = "") {
         $config = Application::$app->config;
@@ -74,5 +84,12 @@ if (!function_exists("route")) {
             return $url;
         }
         return null;
+    }
+}
+
+if (!function_exists("method")) {
+    function method(string $type)
+    {
+        return new \Twig\Markup('<input name="_method" type="hidden" value="' . $type .'" />', 'UTF-8');
     }
 }

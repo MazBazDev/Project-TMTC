@@ -14,7 +14,7 @@ class ContactController
         return Application::$app->router->renderView("contact");
     }
 
-    public static function handleContact(Request $request, $id)
+    public static function handleContact($id)
     {
         return "handling submited datas !";
     }

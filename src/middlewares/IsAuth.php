@@ -13,7 +13,7 @@ class IsAuth implements Middleware
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::check()) {
-            return Application::$app->response->redirect("/login")->with("error", "You need to be logged !");
+            return Application::$app->response->redirect("login")->with("error", "You need to be logged !");
         }
         
         return $next->next($request);
