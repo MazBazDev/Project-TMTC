@@ -39,7 +39,8 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="{{ auth().user().profile_picture }}" alt="Avatar" class="avatar img-fluid rounded-circle">
+                                <img src="{{ auth().user().profile_picture }}" class="avatar img-fluid rounded-circle">
+                                <span>{{ auth().user().firstname }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="#">Profile</a></li>
@@ -58,11 +59,7 @@
 </header>
 
 <body data-bs-theme="dark">
-    <div class="container">
-        <div class="alert success">
-            {{ getflash("success") }}
-
-        </div>
+    <div class="container pt-4">
         {% block content %}{% endblock %}
     </div>
 
