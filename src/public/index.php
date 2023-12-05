@@ -28,6 +28,7 @@ $app->router->group([IsAuth::class], function (Router $router) {
     $router->name("logout")->post('/logout', [AuthController::class, 'logout']);
 
     $router->name("profile")->get('/profile', [AuthController::class, 'profile']);
+    $router->name("profile.update")->patch('/profile', [AuthController::class, 'profile_update']);
 
     $router->name("dashboard")->prefix("/dashboard")->group([IsAdmin::class], function (Router $router) {
         $router->name("index")->get('/', [AdminController::class, 'index']);

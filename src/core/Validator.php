@@ -80,6 +80,8 @@ abstract class Validator
                 return "The {$input} already exist.";
             case 'exist':
                 return "The {$input} does not exist in our data.";
+            case 'equal':
+                return "The {$input} don't match with {$params}";
             default:
                 return "Validation error for the field '{$input}'.";
         }
@@ -167,5 +169,12 @@ abstract class Validator
         $exist = $class->where([$col, $value]) !== false;
 
         return $exist;
+    }
+
+    private function equal($value, $inputName): bool
+    {
+        $inputValue = $this->input($inputName);
+
+        return $value === $inputValue;
     }
 }

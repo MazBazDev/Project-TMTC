@@ -1,26 +1,68 @@
 {% extends "layouts/main.twig" %}
 
+{% block title %} Profile {% endblock %}
+
 {% block content %}
-    <H1>Profile</H1>
+    <H1 class="mb-3">Profile</H1>
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ route("profile.update") }}" method="post">
+                {{ method("patch") }}
 
-    <form action="" method="post">
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="text" class="form-control" name="email" value="{{ old("email", "email@email.com") }}">
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ old("email", user.email) }}">
 
-            {% if error("email") %}
-                <p class="help-block">{{ error("email") }}</p>
-            {% endif %}
+                            {% if error("email") %}
+                                <p class="help-block">{{ error("email") }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">First name</label>
+                            <input type="text" class="form-control" name="firstname" value="{{ old("firstname", user.firstname) }}">
 
+                            {% if error("firstname") %}
+                                <p class="help-block">{{ error("firstname") }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Last name</label>
+                            <input type="text" class="form-control" name="lastname" value="{{ old("lastname", user.lastname) }}">
+
+                            {% if error("lastname") %}
+                                <p class="help-block">{{ error("lastname") }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" value="{{ old("password") }}">
+
+                            {% if error("password") %}
+                                <p class="help-block">{{ error("password") }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password confirm</label>
+                            <input type="password" class="form-control" name="password_confirm" value="{{ old("password_confirm") }}">
+
+                            {% if error("password_confirm") %}
+                                <p class="help-block">{{ error("password_confirm") }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <button class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+            </form>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="text" class="form-control" name="password" value="password">
-            {% if error("password") %}
-                <p class="help-block">{{ error("password") }}</p>
-            {% endif %}
-
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+    </div>
 {% endblock %}
