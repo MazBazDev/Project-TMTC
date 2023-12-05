@@ -20,8 +20,11 @@ class Auth
         $primaryUserValue = Application::$app->session->get("user");
         if ($primaryUserValue) {
             $primaryKey = $userClass->primary_key;
+            $user = $userClass->where([$primaryKey, "=", $primaryUserValue]);
 
-            $this->user = $userClass->where([$primaryKey, "=", $primaryUserValue]);
+            if (!$user) $this->logout();
+
+            $this->user = $user;
         }
     }
 
