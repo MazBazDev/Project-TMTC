@@ -25,7 +25,7 @@ $app->router->group([IsNotAuth::class], function (Router $router) {
 });
 
 $app->router->group([IsAuth::class], function (Router $router) {
-    $router->name("logout")->get('/logout', [AuthController::class, 'logout']);
+    $router->name("logout")->post('/logout', [AuthController::class, 'logout']);
 
     $router->name("dashboard")->prefix("/dashboard")->group([IsAdmin::class], function (Router $router) {
         $router->name("index")->get('/', [AdminController::class, 'index']);
