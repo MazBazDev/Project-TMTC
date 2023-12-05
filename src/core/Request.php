@@ -66,7 +66,7 @@ class Request extends Validator
 
     public function has($input)
     {
-        return isset($this->getBody()[$input]) || isset($this->getBody()[$input]) == "on";
+        return (isset($this->getBody()[$input]) || isset($this->getBody()[$input]) == "on") ? 1 : 0;
     }
 
     public function input($input)

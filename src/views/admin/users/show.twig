@@ -42,6 +42,22 @@
                             {% endif %}
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" value="{{ old("password") }}">
+
+                            {% if error("password") %}
+                                <div class=invalid-feedback">{{ error("password") }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="admin" name="admin" {{ checked(old("admin", user.admin)) }} >
+                            <label class="custom-control-label" for="admin">Admin</label>
+                        </div>
+                    </div>
                     <div class="col">
                         <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
                     </div>

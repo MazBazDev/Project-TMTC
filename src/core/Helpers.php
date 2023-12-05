@@ -45,10 +45,9 @@ if (!function_exists("old")) {
 }
 
 if (!function_exists("checked")) {
-    function checked($input, bool $default = true) {
-        $oldDatas = getFlash("inputs_old");
+    function checked(bool $input = false) {
 
-        return isset($oldDatas[$input]) && $oldDatas[$input] ? 'checked' : '';
+        return $input ? 'checked' : '';
     }
 }
 

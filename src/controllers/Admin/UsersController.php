@@ -3,6 +3,7 @@
 namespace app\controllers\Admin;
 
 use app\core\Application;
+use app\core\Auth;
 use app\core\Controller;
 use app\core\Request;
 use app\models\User;
@@ -48,6 +49,10 @@ class UsersController extends Controller
     {
         $user = $this->getUserById($id);
 
+        if ($user->id === Auth::user()->id) {
+            return $this->response->redirect("profile")->with("info", "You can't edit yourself here ;)");
+        }
+
         return $this->render("admin.users.show", [
             "user" => $user
         ]);
@@ -77,7 +82,14 @@ class UsersController extends Controller
             "firstname" => $this->request->input("firstname"),
             "lastname" => $this->request->input("lastname"),
             "email" => $this->request->input("email"),
+            "admin" => $this->request->has("admin"),
         ]);
+
+        if ($this->request->has("password")) {
+            $user->update([
+                "password" => password_hash($this->request->input("password"), PASSWORD_ARGON2ID),
+            ]);
+        }
 
         return Application::$app->response->redirect()->back()->with("success", "User updated !");
     }
