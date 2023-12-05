@@ -23,6 +23,11 @@
                     </div>
                 </div>
             </div>
+
+            <form action="{{ route("dashboard.file") }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="monfichier" />
+                <button type="submit" class="btn btn-success">Send</button>
+            </form>
         </div>
     </div>
 

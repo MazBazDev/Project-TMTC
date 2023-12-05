@@ -64,6 +64,44 @@ class Request extends Validator
         return $body;
     }
 
+    public function getFiles($input)
+    {
+        $result = [];
+
+        if (isset($_FILES[$input])) {
+            $filesData = $_FILES[$input];
+
+            if (is_array($filesData['name'])) {
+                foreach ($filesData['name'] as $key => $name) {
+                    $result[$key] = [
+                        'name' => $name,
+                        'full_path' => $name, // Vous pouvez ajuster cela selon vos besoins
+                        'type' => $filesData['type'][$key],
+                        'tmp_name' => $filesData['tmp_name'][$key],
+                        'error' => $filesData['error'][$key],
+                        'size' => $filesData['size'][$key],
+                    ];
+                }
+            } else {
+                // Si le champ n'est pas multiple, traitez-le comme un tableau avec un seul élément
+                $result[] = [
+                    'name' => $filesData['name'],
+                    'full_path' => $filesData['name'], // Vous pouvez ajuster cela selon vos besoins
+                    'type' => $filesData['type'],
+                    'tmp_name' => $filesData['tmp_name'],
+                    'error' => $filesData['error'],
+                    'size' => $filesData['size'],
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+
+
+
+
     public function has($input)
     {
         return (isset($this->getBody()[$input]) || isset($this->getBody()[$input]) == "on") ? 1 : 0;

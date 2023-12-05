@@ -8,6 +8,7 @@ use app\core\commands\MakeSeederCommand;
 use app\core\commands\MigrateCommand;
 use app\core\commands\RouteListCommand;
 use app\core\commands\SeedCommand;
+use app\core\commands\StorageLinkCommand;
 use app\core\database\Database;
 use Dotenv\Dotenv;
 use Symfony\Component\Console\Application as SymfonyConsole;
@@ -71,6 +72,8 @@ class Application
         $console->add(new SeedCommand());
 
         $console->add(new MakeAdminCommand());
+
+        $console->add(new StorageLinkCommand());
         $console->run();
     }
 }

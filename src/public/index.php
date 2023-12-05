@@ -32,6 +32,7 @@ $app->router->group([IsAuth::class], function (Router $router) {
 
     $router->name("dashboard")->prefix("/dashboard")->group([IsAdmin::class], function (Router $router) {
         $router->name("index")->get('/', [AdminController::class, 'index']);
+        $router->name("file")->post('/file', [AdminController::class, 'file']);
 
         $router->name("users")->prefix("/users")->group([], function (Router $router) {
             $router->name("index")->get('/', [UsersController::class, 'index']);
