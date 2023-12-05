@@ -9,7 +9,7 @@
     <form action="{{ route("login.store") }}" method="post">
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ old("email", "email@email.com") }}">
+            <input type="email" class="form-control" id="email" name="email" placeholder="email@email.com" value="{{ old("email", "") }}">
 
             {% if error("email") %}
                 <div class="invalid-feedback d-block">{{ error("email") }}</div>
@@ -18,7 +18,7 @@
 
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" value="password">
+            <input type="password" class="form-control" id="password" name="password">
 
             {% if error("password") %}
                 <div class="invalid-feedback d-block">{{ error("password") }}</div>
