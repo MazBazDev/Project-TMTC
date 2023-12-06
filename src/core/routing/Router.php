@@ -69,7 +69,9 @@ class Router
 
     public function middlewares(array $middlewares = []): Router
     {
-        $this->middlewaresCount = sizeof($middlewares);
+        if (!$this->in_array) {
+            $this->middlewaresCount = sizeof($middlewares);
+        }
         $this->currentMiddlewares = array_merge($this->currentMiddlewares, $middlewares);
         return $this;
     }
@@ -90,11 +92,13 @@ class Router
 
         if (!$this->in_array) {
             $this->currentPath = [];
-            $this->currentMiddlewares = [];
             $this->currentName = [];
+
+            if ($this->middlewaresCount > 0) {
+                array_splice($this->currentMiddlewares, $this->middlewaresCount * -1);
+            }
         } else {
             array_pop($this->currentPath);
-            array_splice($this->currentMiddlewares, $this->middlewaresCount * -1);
             array_pop($this->currentName);
         }
     }
