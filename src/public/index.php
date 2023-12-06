@@ -3,44 +3,56 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use app\controllers\Admin\AdminController;
+use app\controllers\Admin\HousingsController;
 use app\controllers\Admin\UsersController;
 use app\controllers\AuthController;
 use app\controllers\HomeController;
 use app\core\Application;
-use app\core\Router;
+use app\core\routing\Router;
 use app\middlewares\IsAuth;
 use app\middlewares\IsAdmin;
 use app\middlewares\IsNotAuth;
 
 $app = new Application(dirname(__DIR__));
 
-$app->router->name("home")->get('/', [HomeController::class, 'index']);
+$router = $app->router;
 
-$app->router->group([IsNotAuth::class], function (Router $router) {
-    $router->name("login")->get('/login', [AuthController::class, 'login']);
-    $router->name("login.store")->post('/login', [AuthController::class, 'login_store']);
 
-    $router->name("register")->get('/register', [AuthController::class, 'register']);
-    $router->name("register.store")->post('/register', [AuthController::class, 'register_store']);
+$router->name("home")->path("/")->get([HomeController::class, 'index']);
+
+$router->middlewares([IsNotAuth::class])->group(function (Router $router) {
+    $router->name("login")->path('/login')->get([AuthController::class, 'login']);
+    $router->name("login.store")->path('/login')->post([AuthController::class, 'login_store']);
+
+    $router->name("register")->path('/register')->get([AuthController::class, 'register']);
+    $router->name("register.store")->path('/register')->post([AuthController::class, 'register_store']);
 });
 
-$app->router->group([IsAuth::class], function (Router $router) {
-    $router->name("logout")->post('/logout', [AuthController::class, 'logout']);
+$router->middlewares([IsAuth::class])->group(function (Router $router) {
+    $router->name("logout")->path('/logout')->post([AuthController::class, 'logout']);
 
-    $router->name("profile")->get('/profile', [AuthController::class, 'profile']);
-    $router->name("profile.update")->patch('/profile', [AuthController::class, 'profile_update']);
+    $router->name("profile")->path('/profile')->get([AuthController::class, 'profile']);
+    $router->name("profile.update")->path('/profile')->patch([AuthController::class, 'profile_update']);
 
-    $router->name("dashboard")->prefix("/dashboard")->group([IsAdmin::class], function (Router $router) {
-        $router->name("index")->get('/', [AdminController::class, 'index']);
-        $router->name("file")->post('/file', [AdminController::class, 'file']);
+    $router->name("dashboard")->path('/dashboard')->middlewares([IsAdmin::class])->group(function (Router $router) {
+        $router->name("index")->path('/')->get([AdminController::class, 'index']);
 
-        $router->name("users")->prefix("/users")->group([], function (Router $router) {
-            $router->name("index")->get('/', [UsersController::class, 'index']);
-            $router->name("create")->get('/create', [UsersController::class, 'create']);
-            $router->name("store")->post('/', [UsersController::class, 'store']);
-            $router->name("show")->get('/:id', [UsersController::class, 'show']);
-            $router->name("update")->patch('/:id', [UsersController::class, 'update']);
-            $router->name("delete")->delete('/:id/delete', [UsersController::class, 'delete']);
+        $router->name("users")->path("/users")->group(function (Router $router) {
+            $router->name("index")->path('/')->get([UsersController::class, 'index']);
+            $router->name("create")->path('/create')->get([UsersController::class, 'create']);
+            $router->name("store")->path('/')->post([UsersController::class, 'store']);
+            $router->name("show")->path('/:id')->get([UsersController::class, 'show']);
+            $router->name("update")->path('/:id')->patch([UsersController::class, 'update']);
+            $router->name("delete")->path('/:id/delete')->delete([UsersController::class, 'delete']);
+        });
+
+        $router->name("housings")->path("/housings")->group(function (Router $router) {
+            $router->name("index")->path('/')->get([HousingsController::class, 'index']);
+            $router->name("create")->path('/create')->get([HousingsController::class, 'create']);
+            $router->name("store")->path('/')->post([HousingsController::class, 'store']);
+            $router->name("show")->path('/:id')->get([HousingsController::class, 'show']);
+            $router->name("update")->path('/:id')->patch([HousingsController::class, 'update']);
+            $router->name("delete")->path('/:id/delete')->delete([HousingsController::class, 'delete']);
         });
     });
 });

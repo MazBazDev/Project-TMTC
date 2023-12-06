@@ -5,23 +5,22 @@ namespace app\controllers\Admin;
 use app\core\Application;
 use app\core\Auth;
 use app\core\Controller;
-use app\core\Request;
-use app\models\User;
+use app\models\Housing;
 
-class UsersController extends Controller
+class HousingsController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $housings = Housing::all();
 
-        return $this->render("admin.users.index", [
-            "users" => $users,
+        return $this->render("admin.housings.index", [
+            "housings" => $housings,
         ]);
     }
 
     public function create()
     {
-        return $this->render("admin.users.create");
+        return $this->render("admin.housings.create");
     }
 
     public function store()
@@ -53,7 +52,7 @@ class UsersController extends Controller
             return $this->response->redirect("profile")->with("info", "You can't edit yourself here ;)");
         }
 
-        return $this->render("admin.users.show", [
+        return $this->render("admin.housings.show", [
             "user" => $user
         ]);
     }
@@ -76,7 +75,7 @@ class UsersController extends Controller
                     "unique" => "Email already exist for an other user !"
                 ]
             ]);
-        }@
+        }
 
         $user->update([
             "firstname" => $this->request->input("firstname"),

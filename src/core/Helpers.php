@@ -99,3 +99,10 @@ if (!function_exists("auth")) {
         return new Auth();
     }
 }
+
+if (!function_exists("dd")) {
+    function dd(...$vars) {
+        dump($vars);
+        die();
+    }
+}
