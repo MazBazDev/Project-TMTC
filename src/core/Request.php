@@ -57,7 +57,7 @@ class Request extends Validator
 
         if ($this->isPost() || $this->isDelete() || $this->isPatch()) {
             foreach ($_POST as $key => $value) {
-                $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
             }
         }
 
