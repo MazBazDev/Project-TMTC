@@ -25,86 +25,64 @@ class HousingsController extends Controller
 
     public function store()
     {
-
         $this->request->validate([
-            "firstname" => "required",
-            "lastname" => "required",
-            "email" => "unique:app\models\User,email;required",
-            "password" => "required;min:4",
+            "name" => "required",
+            "description" => "required",
+            "price" => "required;min:0",
         ]);
 
-        $user = User::create([
-            "email" => strtolower($this->request->input("email")),
-            "firstname" => $this->request->input("firstname"),
-            "lastname" => $this->request->input("lastname"),
-            "password" => password_hash($this->request->input("password"), PASSWORD_ARGON2ID),
-            "admin" => $this->request->has("admin")
+        $housing = Housing::create([
+            "name" => $this->request->input("name"),
+            "description" => htmlspecialchars_decode($this->request->input("description")),
+            "price" => $this->request->input("price"),
+            "active" => $this->request->has("active")
         ]);
 
-        return $this->response->redirect("dashboard.users.show", ["id" => $user->id])->with("success", "User created !");
+        return $this->response->redirect("dashboard.housings.show", ["id" => $housing->id])->with("success", "Housing created !");
     }
 
     public function show($id)
     {
-        $user = $this->getUserById($id);
-
-        if ($user->id === Auth::user()->id) {
-            return $this->response->redirect("profile")->with("info", "You can't edit yourself here ;)");
-        }
+        $housing = $this->getHousing($id);
 
         return $this->render("admin.housings.show", [
-            "user" => $user
+            "housing" => $housing
         ]);
     }
 
     public function update($id)
     {
-        $user = $this->getUserById($id);
+        $housing = $this->getHousing($id);
 
         $this->request->validate([
-            "firstname" => "required",
-            "lastname" => "required",
-            "email" => "required",
+            "name" => "required",
+            "description" => "required",
+            "price" => "required;min:0",
         ]);
 
-        if ($user->email !== $this->request->input("email")) {
-            $this->request->validate([
-                "email" => "unique:app\models\User,email",
-            ], [
-                "email" => [
-                    "unique" => "Email already exist for an other user !"
-                ]
-            ]);
-        }
 
-        $user->update([
-            "firstname" => $this->request->input("firstname"),
-            "lastname" => $this->request->input("lastname"),
-            "email" => $this->request->input("email"),
-            "admin" => $this->request->has("admin"),
+        $housing->update([
+            "name" => $this->request->input("name"),
+            "description" => htmlspecialchars_decode($this->request->input("description")),
+            "price" => $this->request->input("price"),
+            "active" => $this->request->has("active")
         ]);
 
-        if ($this->request->has("password")) {
-            $user->update([
-                "password" => password_hash($this->request->input("password"), PASSWORD_ARGON2ID),
-            ]);
-        }
-
-        return Application::$app->response->redirect()->back()->with("success", "User updated !");
+        return Application::$app->response->redirect()->back()->with("success", "Housing updated !");
     }
 
     public function delete($id) {
-        $user = $this->getUserById($id);
-        $user->delete();
+        $housing = $this->getHousing($id);
+        $housing->delete();
 
-        return Application::$app->response->redirect()->back()->with("success", "User deleted !");
+        return Application::$app->response->redirect("dashboard.housings.index")->with("success", "Housing deleted !");
     }
 
-    private function getUserById($id) : User {
-        $user = User::where(["id", "=", $id]) ?? false;
+    private function getHousing($id) : Housing {
+        $housing = Housing::where(["id", "=", $id]) ?? false;
 
-        Application::$app->response->abort_if(!$user);
+        Application::$app->response->abort_if(!$housing);
 
-        return $user;
+        return $housing;
     }
 }

@@ -65,8 +65,9 @@
             </form>
 
             <form method="post" action="{{ route('dashboard.users.delete', {'id': user.id}) }}">
-                <input name="_method" type="hidden" value="delete" />
-                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Selete</button>
+                {{ method("delete") }}
+
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
             </form>
         </div>
     </div>

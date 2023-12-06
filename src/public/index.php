@@ -56,5 +56,5 @@ $router->middlewares([IsAuth::class])->group(function (Router $router) {
         });
     });
 });
-
+//dd($router->associatedRoutes);
 $app->run();

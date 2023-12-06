@@ -14,15 +14,22 @@
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
                     <th scope="col">Price</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                     {% for housing in housings %}
                         <tr>
                             <th scope="row">{{ housing.id }}</th>
-                            <td>{{ user.name }}</td>
-                            <td>{{ user.price }}</td>
+                            <td>{{ housing.name }}</td>
+                            <td>{{ housing.price }}</td>
 
+                            {% if housing.active %}
+                                <td><span class="badge badge-warning">Active</span></td>
+                            {% else %}
+                                <td><span class="badge badge-danger">Disabled</span></td>
+                            {% endif %}
 
                             <td class="d-flex gap-3">
                                 <a href="{{ route('dashboard.housings.show', {'id': housing.id}) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>

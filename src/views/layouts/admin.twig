@@ -21,6 +21,8 @@
 
     <script src="{{ asset("admin/vendor/notiflix/dist/notiflix-aio-3.2.6.min.js") }}"></script>
 
+    <script src="https://cdn.tiny.cloud/1/{{ env("TINY_API_KEY") }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
     {% block scripts %}{% endblock %}
 
     {% block styles %}{% endblock %}
@@ -232,6 +234,11 @@
         {% if getflash("info")  %}
         Notiflix.Notify.info("{{ getflash("info") }}");
         {% endif %}
+
+
+        tinymce.init({
+            selector: 'textarea#tiny'
+        });
     </script>
 </body>
 </html>

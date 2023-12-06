@@ -91,14 +91,14 @@ class UsersController extends Controller
             ]);
         }
 
-        return Application::$app->response->redirect()->back()->with("success", "User updated !");
+        return Application::$app->response->redirect("dashboard.users.show", ["id" => $id])->with("success", "User updated !");
     }
 
     public function delete($id) {
         $user = $this->getUserById($id);
         $user->delete();
 
-        return Application::$app->response->redirect()->back()->with("success", "User deleted !");
+        return Application::$app->response->redirect("dashboard.users.index")->with("success", "User deleted !");
     }
 
     private function getUserById($id) : User {

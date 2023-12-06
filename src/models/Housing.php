@@ -12,6 +12,7 @@ class Housing extends Models
         "description",
         "price",
         "created_at",
+        "active"
     ];
 
 }
