@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use app\controllers\Admin\AdminController;
+use app\controllers\Admin\EquipmentsController;
 use app\controllers\Admin\HousingsController;
 use app\controllers\Admin\UsersController;
 use app\controllers\AuthController;
@@ -54,6 +55,15 @@ $router->middlewares([IsAuth::class])->group(function (Router $router) {
             $router->name("update")->path('/:id')->patch([HousingsController::class, 'update']);
             $router->name("delete")->path('/:id/delete')->delete([HousingsController::class, 'delete']);
             $router->name("image.delete")->path('/:id/image/:imageid/delete')->get([HousingsController::class, 'image_delete']);
+        });
+
+        $router->name("equipments")->path("/equipments")->group(function (Router $router) {
+            $router->name("index")->path('/')->get([EquipmentsController::class, 'index']);
+            $router->name("create")->path('/create')->get([EquipmentsController::class, 'create']);
+            $router->name("store")->path('/')->post([EquipmentsController::class, 'store']);
+            $router->name("show")->path('/:id')->get([EquipmentsController::class, 'show']);
+            $router->name("update")->path('/:id')->patch([EquipmentsController::class, 'update']);
+            $router->name("delete")->path('/:id/delete')->delete([EquipmentsController::class, 'delete']);
         });
     });
 });
