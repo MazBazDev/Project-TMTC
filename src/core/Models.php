@@ -2,6 +2,7 @@
 
 namespace app\core;
 
+use app\models\Housing;
 use PDO;
 
 class Models
@@ -11,6 +12,8 @@ class Models
     public $primary_key = "id";
     protected array $fillable = [];
     private array $form_datas = [];
+    private $query;
+
 
     public static function create(array $data)
     {
@@ -26,9 +29,13 @@ class Models
         $setValues = [];
 
         foreach ($data as $key => $value) {
-            if (in_array($key, $this->fillable)) {
-                $setValues[] = "$key = '" . $value . "'";
-                $this->$key = $value;
+            if ($value === null) {
+                $setValues[] = "$key = NULL";
+            } else {
+                if (in_array($key, $this->fillable)) {
+                    $setValues[] = "$key = '" . $value . "'";
+                    $this->$key = $value;
+                }
             }
         }
 
@@ -44,6 +51,7 @@ class Models
             return null;
         }
     }
+
 
     public function delete()
     {
@@ -127,6 +135,8 @@ class Models
     public static function where($sub = [])
     {
         $instance = new static();
+        $instance->query = "SELECT * FROM {$instance->table}";
+
         $ope = "=";
 
         if (sizeof($sub) === 2) {
@@ -138,83 +148,47 @@ class Models
             $value = $sub[2];
         }
 
-        $query = "SELECT * FROM {$instance->table} WHERE $key $ope '$value'";
-
-        try {
-            $stmt = Application::$app->db->pdo->query($query);
-
-            $result = $stmt->fetchObject(get_called_class());
-        } catch (\PDOException $e) {
-            // Gérer les erreurs PDO ici.
-            echo "Erreur lors de la récupération des données : " . $e->getMessage();
-            $result = null;
-        }
-
-        return $result;
+        $instance->query .= " WHERE $key $ope '$value'";
+        return $instance;
     }
-
 
     public function first()
     {
-        $instance = new static();
+        $this->query .= " LIMIT 1";
 
-        $query = "SELECT * FROM {$instance->table} LIMIT 1";
+        $stmt = Application::$app->db->pdo->query($this->query);
 
-        try {
-            $stmt = Application::$app->db->pdo->query($query);
-
-            $result = $stmt->fetchObject(get_called_class());
-        } catch (\PDOException $e) {
-            echo "Erreur lors de la récupération des données : " . $e->getMessage();
-
-            $result = null;
-        }
-
-        return $result;
+        return $stmt->fetchObject(get_called_class());
     }
 
-    public function last()
+    public function last($by = "id")
     {
-        $instance = new static();
+        $this->query .= " ORDER BY {$by} DESC LIMIT 1";
+        $stmt = Application::$app->db->pdo->query($this->query);
 
-        $query = "SELECT * FROM {$instance->table} ORDER BY id DESC LIMIT 1";
+        return $stmt->fetchObject(get_called_class());
+    }
 
+    public function get()
+    {
         try {
-            $stmt = Application::$app->db->pdo->query($query);
+            $stmt = Application::$app->db->pdo->query($this->query);
+            $results = $stmt->fetchAll(\PDO::FETCH_CLASS, get_called_class());
 
-            $result = $stmt->fetchObject(get_called_class());
+            return $results;
         } catch (\PDOException $e) {
+            // Gérer les erreurs PDO ici.
             echo "Erreur lors de la récupération des données : " . $e->getMessage();
-
-            $result = null;
+            return null;
         }
-
-        return $result;
     }
 
     public function count()
     {
-        $instance = new static();
-
-        $query = "SELECT COUNT(*) as count FROM {$instance->table}";
-
-        try {
-            $stmt = Application::$app->db->pdo->query($query);
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($result !== false && isset($result['count'])) {
-                $count = intval($result['count']);
-
-                return $count;
-            } else {
-                return 0;
-            }
-        } catch (\PDOException $e) {
-            echo "Erreur lors de la récupération des données : " . $e->getMessage();
-
-            return null;
-        }
+        $this->query = "SELECT COUNT(*) as count FROM {$this->table}";
+        return $this->get()->fetch(PDO::FETCH_ASSOC)['count'];
     }
+
 
     public function hasMany(Models $relatedModel, string $foreignKey)
     {
@@ -223,11 +197,19 @@ class Models
     }
 
 
+    public function oneToMany(string $relatedModel, $fk)
+    {
+        $relatedInstance = new $relatedModel();
+
+        dd(Housing::where([$fk, $this->id]));
+        return $relatedInstance->where([$fk, '=', $this->id])->get();
+    }
+
     public function belongsTo(string $relatedModel, string $foreignKey = "id")
     {
         $relatedInstance = new $relatedModel();
         $foreignKeyValue = $this->$foreignKey;
-        return $relatedInstance->where(['id', '=', $foreignKeyValue]);
+        return $relatedInstance->where(['id', '=', $foreignKeyValue])->get();
     }
 
     public function belongsToMany(string $relatedModel)

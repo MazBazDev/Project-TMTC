@@ -73,7 +73,7 @@ class EquipmentsController extends Controller
     }
 
     private function getEquipment($id) : Equipment {
-        $equipment = Equipment::where(["id", "=", $id]) ?? false;
+        $equipment = Equipment::where(["id", "=", $id])->get() ?? false;
 
         Application::$app->response->abort_if(!$equipment);
 

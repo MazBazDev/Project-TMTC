@@ -31,7 +31,7 @@ class Files
 
     public static function delete($id)
     {
-        $file = File::where(["id", $id]);
+        $file = File::where(["id", $id])->first();
         if ($file) {
             unlink(Application::$ROOT_DIR . $file->path . $file->ext);
             return $file->delete();

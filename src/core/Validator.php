@@ -155,7 +155,7 @@ abstract class Validator
 
         $class = new $class();
 
-        $exist = $class->where([$col, $value]) !== false;
+        $exist = $class->where([$col, $value])->first() !== false;
 
         return !$exist;
     }
@@ -166,7 +166,7 @@ abstract class Validator
 
         $class = new $class();
 
-        $exist = $class->where([$col, $value]) !== false;
+        $exist = $class->where([$col, $value])->first() !== false;
 
         return $exist;
     }

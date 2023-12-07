@@ -9,6 +9,7 @@ use app\core\Files;
 use app\models\Equipment;
 use app\models\File;
 use app\models\Housing;
+use app\models\HousingsType;
 
 class HousingsController extends Controller
 {
@@ -26,7 +27,8 @@ class HousingsController extends Controller
         $equipments = Equipment::all();
 
         return $this->render("admin.housings.create", [
-            "equipments" => $equipments
+            "equipments" => $equipments,
+            "types" => HousingsType::all(),
         ]);
     }
 
@@ -36,13 +38,16 @@ class HousingsController extends Controller
             "name" => "required",
             "description" => "required",
             "price" => "required;min:0",
+            "type" => "required"
         ]);
+
 
         $housing = Housing::create([
             "name" => $this->request->input("name"),
             "description" => htmlspecialchars_decode($this->request->input("description")),
             "price" => $this->request->input("price"),
-            "active" => $this->request->has("active")
+            "active" => $this->request->has("active"),
+            "housing_types_id" => intval($this->request->input("type"))
         ]);
 
         $images = $this->request->getFiles("images");
@@ -78,6 +83,7 @@ class HousingsController extends Controller
         return $this->render("admin.housings.show", [
             "housing" => $housing,
             "availableEquipments" => $availableEquipments,
+            "types" => HousingsType::all(),
         ]);
     }
 
@@ -89,13 +95,15 @@ class HousingsController extends Controller
             "name" => "required",
             "description" => "required",
             "price" => "required;min:0",
+            "type" => "required"
         ]);
 
         $housing->update([
             "name" => $this->request->input("name"),
             "description" => htmlspecialchars_decode($this->request->input("description")),
             "price" => $this->request->input("price"),
-            "active" => $this->request->has("active")
+            "active" => $this->request->has("active"),
+            "housing_types_id" => $this->request->input("type"),
         ]);
 
         $images = $this->request->getFiles("images");
@@ -153,10 +161,10 @@ class HousingsController extends Controller
 
     private function getImageById($id)
     {
-        return File::where(["id", $id]) ?? false;
+        return File::where(["id", $id])->first() ?? false;
     }
     private function getHousing($id) : Housing {
-        $housing = Housing::where(["id", "=", $id]) ?? false;
+        $housing = Housing::where(["id", "=", $id])->first() ?? false;
 
         Application::$app->response->abort_if(!$housing);
 
@@ -165,6 +173,6 @@ class HousingsController extends Controller
 
     private function getEquipmentById($id)
     {
-        return Equipment::where(["id", $id]);
+        return Equipment::where(["id", $id])->first();
     }
 }

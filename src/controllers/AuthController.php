@@ -26,7 +26,7 @@ class AuthController extends Controller
             ]
         ]);
 
-        $user = User::where(["email", $this->request->input("email")]);
+        $user = User::where(["email", $this->request->input("email")])->first();
 
         if (!password_verify($this->request->input("password"), $user->password)) {
             return $this->response

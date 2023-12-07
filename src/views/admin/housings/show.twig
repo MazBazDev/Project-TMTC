@@ -74,6 +74,20 @@
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <select class="form-control" id="type" name="type">
+                                {% for type in types %}
+                                    <option  {% if type.id is same as old("type", housing.getType().id)  %} selected {% endif %} value="{{ type.id }}">{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+
+                            {% if error("type") %}
+                                <div class=invalid-feedback">{{ error("type") }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="price">Price</label>

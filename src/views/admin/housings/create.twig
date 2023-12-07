@@ -33,7 +33,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea required class="form-control" name="description" id="tiny" cols="30" rows="10">{{ old("description") }}</textarea>
+                            <textarea class="form-control" name="description" id="tiny" cols="30" rows="10">{{ old("description") }}</textarea>
 
                             {% if error("description") %}
                                 <div class=invalid-feedback">{{ error("description") }}</div>
@@ -50,6 +50,21 @@
                                     <option value="{{ equipment.id }}">{{ equipment.name }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <select class="form-control" id="type" name="type">
+                                {% for type in types %}
+                                    <option  {% if type.id is same as old("type")  %} selected {% endif %} value="{{ type.id }}">{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+
+                            {% if error("type") %}
+                                <div class=invalid-feedback">{{ error("type") }}</div>
+                            {% endif %}
                         </div>
                     </div>
 

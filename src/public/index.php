@@ -5,6 +5,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use app\controllers\Admin\AdminController;
 use app\controllers\Admin\EquipmentsController;
 use app\controllers\Admin\HousingsController;
+use app\controllers\Admin\HousingsTypesController;
 use app\controllers\Admin\UsersController;
 use app\controllers\AuthController;
 use app\controllers\HomeController;
@@ -65,7 +66,16 @@ $router->middlewares([IsAuth::class])->group(function (Router $router) {
             $router->name("update")->path('/:id')->patch([EquipmentsController::class, 'update']);
             $router->name("delete")->path('/:id/delete')->delete([EquipmentsController::class, 'delete']);
         });
+
+        $router->name("housings.types")->path("/types")->group(function (Router $router) {
+            $router->name("index")->path('/')->get([HousingsTypesController::class, 'index']);
+            $router->name("create")->path('/create')->get([HousingsTypesController::class, 'create']);
+            $router->name("store")->path('/')->post([HousingsTypesController::class, 'store']);
+            $router->name("show")->path('/:id')->get([HousingsTypesController::class, 'show']);
+            $router->name("update")->path('/:id')->patch([HousingsTypesController::class, 'update']);
+            $router->name("delete")->path('/:id/delete')->delete([HousingsTypesController::class, 'delete']);
+        });
     });
 });
-//dd($router->associatedRoutes);
+
 $app->run();

@@ -15,6 +15,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">Price</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Type</th>
                     <th scope="col">Actions</th>
                 </tr>
                 </thead>
@@ -29,6 +30,12 @@
                                 <td><span class="badge badge-warning">Active</span></td>
                             {% else %}
                                 <td><span class="badge badge-danger">Disabled</span></td>
+                            {% endif %}
+
+                            {% if housing.getType() is same as false %}
+                                <td><span class="badge badge-danger">Any type !</span></td>
+                            {% else %}
+                                <td>{{  housing.getType().name }}</td>
                             {% endif %}
 
                             <td class="d-flex gap-3">
