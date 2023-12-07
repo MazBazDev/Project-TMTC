@@ -55,6 +55,25 @@
                             {% endif %}
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="equipments">Equipments <sup>* multiple</sup></label>
+                            <select multiple class="form-control" id="equipments" name="equipments[]">
+                                <option value="">Any options</option>
+
+
+                                {% for equipment in housing.getEquipments() %}
+                                    <option selected value="{{ equipment.id }}">{{ equipment.name }}</option>
+                                {% endfor %}
+
+                                {% for equipment in availableEquipments %}
+                                    <option value="{{ equipment.id }}">{{ equipment.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="price">Price</label>

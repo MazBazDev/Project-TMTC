@@ -30,6 +30,7 @@ class EquipmentsController extends Controller
 
         $equipment = Equipment::create([
             "name" => $this->request->input("name"),
+            "description" => $this->request->input("description") ?? null
         ]);
 
         return $this->response->redirect("dashboard.equipments.show", ["id" => $equipment->id])->with("success", "Equipment created !");
@@ -38,7 +39,6 @@ class EquipmentsController extends Controller
     public function show($id)
     {
         $equipments = $this->getEquipment($id);
-
         return $this->render("admin.equipments.show", [
             "equipment" => $equipments
         ]);
@@ -54,6 +54,7 @@ class EquipmentsController extends Controller
 
         $equipment->update([
             "name" => $this->request->input("name"),
+            "description" => $this->request->input("description") ?? null
         ]);
 
         return Application::$app->response->redirect("dashboard.equipments.show", ["id" => $id])->with("success", "Equipment updated !");
@@ -62,10 +63,9 @@ class EquipmentsController extends Controller
     public function delete($id) {
         $equipment = $this->getEquipment($id);
 
-//        foreach ($equipment->getImages() as $image) {
-//            $equipment->detach(File::class, $image->id);
-//            Files::delete($image->id);
-//        }
+        foreach ($equipment->getHousings() as $housing) {
+            $housing->detach(Equipment::class, $equipment->id);
+        }
 
         $equipment->delete();
 

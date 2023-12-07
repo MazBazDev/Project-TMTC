@@ -6,6 +6,7 @@ use app\core\Application;
 use app\core\Auth;
 use app\core\Controller;
 use app\core\Files;
+use app\models\Equipment;
 use app\models\File;
 use app\models\Housing;
 
@@ -22,7 +23,11 @@ class HousingsController extends Controller
 
     public function create()
     {
-        return $this->render("admin.housings.create");
+        $equipments = Equipment::all();
+
+        return $this->render("admin.housings.create", [
+            "equipments" => $equipments
+        ]);
     }
 
     public function store()
@@ -48,6 +53,17 @@ class HousingsController extends Controller
             }
         }
 
+        if ($this->request->has("equipments")) {
+            foreach ($this->request->input("equipments") as $equipmentId) {
+                $equipment = $this->getEquipmentById($equipmentId);
+
+                if (!$equipment) continue;
+
+                $housing->addEquipment($equipment->id);
+            }
+        }
+
+
         return $this->response->redirect("dashboard.housings.show", ["id" => $housing->id])->with("success", "Housing created !");
     }
 
@@ -55,8 +71,13 @@ class HousingsController extends Controller
     {
         $housing = $this->getHousing($id);
 
+        $availableEquipments = array_udiff(Equipment::all(), $housing->getEquipments(), function ($obj1, $obj2) {
+            return $obj1->id - $obj2->id;
+        });
+
         return $this->render("admin.housings.show", [
-            "housing" => $housing
+            "housing" => $housing,
+            "availableEquipments" => $availableEquipments,
         ]);
     }
 
@@ -78,11 +99,24 @@ class HousingsController extends Controller
         ]);
 
         $images = $this->request->getFiles("images");
-
         if (!empty($images)) {
             $images = Files::store($images);
             foreach ($images as $image) {
                 $housing->addImage($image->id);
+            }
+        }
+
+        if ($this->request->has("equipments")) {
+            foreach ($housing->getEquipments() as $equipment) {
+                $housing->detach(Equipment::class, $equipment->id);
+            }
+
+            foreach ($this->request->input("equipments") as $equipmentId) {
+                $equipment = $this->getEquipmentById($equipmentId);
+
+                if (!$equipment) continue;
+
+                $housing->addEquipment($equipment->id);
             }
         }
 
@@ -127,5 +161,10 @@ class HousingsController extends Controller
         Application::$app->response->abort_if(!$housing);
 
         return $housing;
+    }
+
+    private function getEquipmentById($id)
+    {
+        return Equipment::where(["id", $id]);
     }
 }

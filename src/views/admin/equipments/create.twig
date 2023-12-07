@@ -21,6 +21,16 @@
                         </div>
                     </div>
                     <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" name="description" id="tiny" cols="30" rows="10">{{ old("description") }}</textarea>
+
+                            {% if error("description") %}
+                                <div class=invalid-feedback">{{ error("description") }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-12">
                         <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Create</button>
                     </div>
                 </div>

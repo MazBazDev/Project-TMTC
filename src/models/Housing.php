@@ -7,7 +7,7 @@ use app\core\Models;
 
 class Housing extends Models
 {
-    protected $table = "housings";
+    public $table = "housings";
     protected array $fillable = [
         "name",
         "description",
@@ -24,5 +24,14 @@ class Housing extends Models
     public function getImages()
     {
         return $this->belongsToMany(File::class);
+    }
+
+    public function addEquipment(int $equipment_id)
+    {
+        $this->attach(Equipment::class, $equipment_id);
+    }
+    public function getEquipments()
+    {
+        return $this->belongsToMany(Equipment::class);
     }
 }
