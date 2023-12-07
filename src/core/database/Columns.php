@@ -18,6 +18,14 @@ class Columns
         return $this;
     }
 
+    public function int($name): Columns
+    {
+        $this->currentColumn = $name;
+
+        $this->columns[$name]['type'] = 'INT';
+        return $this;
+    }
+
     public function timestamp($name): Columns
     {
         $this->currentColumn = $name;

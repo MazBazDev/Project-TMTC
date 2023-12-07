@@ -9,7 +9,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form method="post" action="{{ route("dashboard.housings.update", {id : housing.id}) }}" class="mb-3">
+            <form method="post" action="{{ route("dashboard.housings.update", {id : housing.id}) }}" class="mb-3" enctype="multipart/form-data">
                 {{ method("patch") }}
                 <div class="row">
                     <div class="col-md-4">
@@ -21,6 +21,28 @@
                                 <div class=invalid-feedback">{{ error("name") }}</div>
                             {% endif %}
                         </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="images">Images</label>
+                            <input type="file" class="form-control-file" id="images" name="images[]" multiple value="{{ old("images") }}">
+
+                            {% if error("images") %}
+                                <div class=invalid-feedback">{{ error("images") }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 d-flex overflow-auto ">
+                        {% for image in housing.getImages() %}
+                            <div class="m-2">
+                                <img height="150" src="{{ image.getPath() }}" alt="{{ image.name }}" class="mb-2">
+                                <div class="d-grid">
+                                    <a href="{{ route("dashboard.housings.image.delete", {id : housing.id, imageid: image.id}) }}" class="btn btn-danger w-100"><i class="fas fa-trash"></i> Delete</a>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">

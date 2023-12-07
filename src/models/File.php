@@ -13,4 +13,9 @@ class File extends Models
         "path",
         "ext",
     ];
+
+    public function getPath()
+    {
+        return env("APP_URL") . $this->path . $this->ext;
+    }
 }

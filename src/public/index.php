@@ -53,6 +53,7 @@ $router->middlewares([IsAuth::class])->group(function (Router $router) {
             $router->name("show")->path('/:id')->get([HousingsController::class, 'show']);
             $router->name("update")->path('/:id')->patch([HousingsController::class, 'update']);
             $router->name("delete")->path('/:id/delete')->delete([HousingsController::class, 'delete']);
+            $router->name("image.delete")->path('/:id/image/:imageid/delete')->get([HousingsController::class, 'image_delete']);
         });
     });
 });

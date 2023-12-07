@@ -223,11 +223,11 @@ class Models
     }
 
 
-    public function belongsTo(Models $relatedModel, string $foreignKey = "id")
+    public function belongsTo(string $relatedModel, string $foreignKey = "id")
     {
         $relatedInstance = new $relatedModel();
         $foreignKeyValue = $this->$foreignKey;
-        return $relatedInstance->where(['id', '=', $foreignKeyValue])->first();
+        return $relatedInstance->where(['id', '=', $foreignKeyValue]);
     }
 
     public function belongsToMany(string $relatedModel)
@@ -242,9 +242,7 @@ class Models
         $columnB = "{$tables[1]}_id";
 
         // Retourner les résultats liés
-        $query = "SELECT {$relatedModel}.* FROM {$relatedModel}
-                  INNER JOIN {$pivotTable} ON {$relatedModel}.id = {$pivotTable}.{$columnB}
-                  WHERE {$pivotTable}.{$columnA} = {$this->id}";
+        $query = "SELECT {$tables[0]}.* FROM {$tables[0]} JOIN {$pivotTable} ON {$tables[0]}.id = {$pivotTable}.{$columnA} WHERE {$pivotTable}.{$columnB} = {$this->id};";
 
         try {
             $stmt = Application::$app->db->pdo->query($query);
@@ -266,7 +264,23 @@ class Models
         $columnA = "{$tables[0]}_id";
         $columnB = "{$tables[1]}_id";
 
-        $query = "INSERT INTO {$pivotTable} ({$columnA}, {$columnB}) VALUES ({$this->id}, {$relatedId})";
+        // Vérifier si la combinaison existe déjà
+        $queryCheck = "SELECT COUNT(*) as count FROM {$pivotTable} WHERE {$columnB} = {$this->id} AND {$columnA} = {$relatedId}";
+
+        try {
+            $stmtCheck = Application::$app->db->pdo->query($queryCheck);
+            $resultCheck = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+            if ($resultCheck && $resultCheck['count'] > 0) {
+                // La combinaison existe déjà, ne rien faire
+                return true;
+            }
+        } catch (\PDOException $e) {
+            echo "Erreur lors de la vérification : " . $e->getMessage();
+            return false;
+        }
+
+        // La combinaison n'existe pas, exécuter l'insertion
+        $query = "INSERT INTO {$pivotTable} ({$columnB}, {$columnA}) VALUES ({$this->id}, {$relatedId})";
 
         try {
             Application::$app->db->pdo->exec($query);
@@ -277,6 +291,7 @@ class Models
         }
     }
 
+
     public function detach(string $relatedModel, int $relatedId)
     {
         $tables = [$this->table, (new $relatedModel())->table];
@@ -286,7 +301,7 @@ class Models
         $columnA = "{$tables[0]}_id";
         $columnB = "{$tables[1]}_id";
 
-        $query = "DELETE FROM {$pivotTable} WHERE {$columnA} = {$this->id} AND {$columnB} = {$relatedId}";
+        $query = "DELETE FROM {$pivotTable} WHERE {$columnB} = {$this->id} AND {$columnA} = {$relatedId}";
 
         try {
             Application::$app->db->pdo->exec($query);

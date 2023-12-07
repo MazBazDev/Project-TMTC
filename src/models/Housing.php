@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\core\Files;
 use app\core\Models;
 
 class Housing extends Models
@@ -15,4 +16,13 @@ class Housing extends Models
         "active"
     ];
 
+    public function addImage(int $image_id)
+    {
+        $this->attach(File::class, $image_id);
+    }
+
+    public function getImages()
+    {
+        return $this->belongsToMany(File::class);
+    }
 }
