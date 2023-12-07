@@ -91,6 +91,12 @@ class HousingsController extends Controller
 
     public function delete($id) {
         $housing = $this->getHousing($id);
+
+        foreach ($housing->getImages() as $image) {
+            $housing->detach(File::class, $image->id);
+            Files::delete($image->id);
+        }
+
         $housing->delete();
 
         return Application::$app->response->redirect("dashboard.housings.index")->with("success", "Housing deleted !");
