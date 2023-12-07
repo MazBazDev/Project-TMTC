@@ -215,16 +215,21 @@ class Models
     public function belongsToMany(string $relatedModel)
     {
         // Déterminer le nom de la table pivot en ordre alphabétique
+        //i'm eq i want services
         $tables = [$this->table, (new $relatedModel())->table];
+//    dd($tables);
         sort($tables);
         $pivotTable = implode('_', $tables);
-
         // Déterminer les noms des colonnes dans la table pivot
-        $columnA = "{$tables[0]}_id";
-        $columnB = "{$tables[1]}_id";
+        $columnA = "{$tables[0]}_id"; // se
+        $columnB = "{$tables[1]}_id"; // eq
 
         // Retourner les résultats liés
-        $query = "SELECT {$tables[0]}.* FROM {$tables[0]} JOIN {$pivotTable} ON {$tables[0]}.id = {$pivotTable}.{$columnA} WHERE {$pivotTable}.{$columnB} = {$this->id};";
+        if ($tables[0] == $this->table) {
+            $query = "SELECT {$tables[1]}.* FROM {$tables[1]} JOIN {$pivotTable} ON {$tables[1]}.id = {$pivotTable}.{$columnB} WHERE {$pivotTable}.{$columnA} = {$this->id};";
+        } else {
+            $query = "SELECT {$tables[0]}.* FROM {$tables[0]} JOIN {$pivotTable} ON {$tables[0]}.id = {$pivotTable}.{$columnA} WHERE {$pivotTable}.{$columnB} = {$this->id};";
+        }
 
         try {
             $stmt = Application::$app->db->pdo->query($query);
@@ -248,6 +253,7 @@ class Models
         $columnA = "{$tables[0]}_id";
         $columnB = "{$tables[1]}_id";
 
+
         // Retourner les résultats liés
         $query = "SELECT {$tables[1]}.* FROM {$tables[1]} JOIN {$pivotTable} ON {$tables[1]}.id = {$pivotTable}.{$columnB} WHERE {$pivotTable}.{$columnA} = {$this->id};";
 
@@ -264,16 +270,24 @@ class Models
 
     public function attach(string $relatedModel, int $relatedId)
     {
-        $tables = [$this->table, (new $relatedModel())->table];
+        $relatedModel = new $relatedModel();
+
+        $tables = [$this->table, $relatedModel->table];
+
         sort($tables);
+
         $pivotTable = implode('_', $tables);
 
         $columnA = "{$tables[0]}_id";
         $columnB = "{$tables[1]}_id";
 
-        // Vérifier si la combinaison existe déjà
-        $queryCheck = "SELECT COUNT(*) as count FROM {$pivotTable} WHERE {$columnB} = {$this->id} AND {$columnA} = {$relatedId}";
+        if ($tables[0] === $this->table) {
+            $queryCheck = "SELECT COUNT(*) as count FROM {$pivotTable} WHERE  {$columnA} = {$this->id} AND {$columnB} = {$relatedId}";
+        } else {
+            $queryCheck = "SELECT COUNT(*) as count FROM {$pivotTable} WHERE  {$columnB} = {$this->id} AND {$columnA} = {$relatedId}";
+        }
 
+        // Vérifier si la combinaison existe déjà
         try {
             $stmtCheck = Application::$app->db->pdo->query($queryCheck);
             $resultCheck = $stmtCheck->fetch(PDO::FETCH_ASSOC);
@@ -287,7 +301,11 @@ class Models
         }
 
         // La combinaison n'existe pas, exécuter l'insertion
-        $query = "INSERT INTO {$pivotTable} ({$columnB}, {$columnA}) VALUES ({$this->id}, {$relatedId})";
+        if ($tables[0] === $this->table) {
+            $query = "INSERT INTO {$pivotTable} ({$columnA}, {$columnB}) VALUES ({$this->id}, {$relatedId})";
+        } else {
+            $query = "INSERT INTO {$pivotTable} ({$columnB}, {$columnA}) VALUES ({$this->id}, {$relatedId})";
+        }
 
         try {
             Application::$app->db->pdo->exec($query);
@@ -308,7 +326,13 @@ class Models
         $columnA = "{$tables[0]}_id";
         $columnB = "{$tables[1]}_id";
 
-        $query = "DELETE FROM {$pivotTable} WHERE {$columnB} = {$this->id} AND {$columnA} = {$relatedId}";
+
+        if ($tables[0] === $this->table) {
+            $query = "DELETE FROM {$pivotTable} WHERE {$columnA} = {$this->id} AND {$columnB} = {$relatedId}";
+
+        } else {
+            $query = "DELETE FROM {$pivotTable} WHERE {$columnB} = {$this->id} AND {$columnA} = {$relatedId}";
+        }
 
         try {
             Application::$app->db->pdo->exec($query);
