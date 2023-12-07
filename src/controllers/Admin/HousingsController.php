@@ -10,6 +10,7 @@ use app\models\Equipment;
 use app\models\File;
 use app\models\Housing;
 use app\models\HousingsType;
+use app\models\Services;
 
 class HousingsController extends Controller
 {
@@ -29,6 +30,7 @@ class HousingsController extends Controller
         return $this->render("admin.housings.create", [
             "equipments" => $equipments,
             "types" => HousingsType::all(),
+            "services" => Services::all(),
         ]);
     }
 
@@ -68,6 +70,16 @@ class HousingsController extends Controller
             }
         }
 
+        if ($this->request->has("services")) {
+            foreach ($this->request->input("services") as $serviceId) {
+                $service = $this->getServiceById($serviceId);
+
+                if (!$service) continue;
+
+                $housing->addService($service->id);
+            }
+        }
+
 
         return $this->response->redirect("dashboard.housings.show", ["id" => $housing->id])->with("success", "Housing created !");
     }
@@ -80,9 +92,15 @@ class HousingsController extends Controller
             return $obj1->id - $obj2->id;
         });
 
+
+        $availableServices = array_udiff(Services::all(), $housing->getServices(), function ($obj1, $obj2) {
+            return $obj1->id - $obj2->id;
+        });
+
         return $this->render("admin.housings.show", [
             "housing" => $housing,
             "availableEquipments" => $availableEquipments,
+            "availableServices" => $availableServices,
             "types" => HousingsType::all(),
         ]);
     }
@@ -128,6 +146,19 @@ class HousingsController extends Controller
             }
         }
 
+        if ($this->request->has("services")) {
+            foreach ($housing->getServices() as $service) {
+                $housing->detach(Services::class, $service->id);
+            }
+
+            foreach ($this->request->input("services") as $serviceId) {
+                $service = $this->getServiceById($serviceId);
+
+                if (!$service) continue;
+
+                $housing->addService($service->id);
+            }
+        }
         return Application::$app->response->redirect("dashboard.housings.show", ["id" => $id])->with("success", "Housing updated !");
     }
 
@@ -137,6 +168,14 @@ class HousingsController extends Controller
         foreach ($housing->getImages() as $image) {
             $housing->detach(File::class, $image->id);
             Files::delete($image->id);
+        }
+
+        foreach ($housing->getEquipments() as $eqip) {
+            $housing->detach(Equipment::class, $eqip->id);
+        }
+
+        foreach ($housing->getServices() as $service) {
+            $housing->detach(Services::class, $service->id);
         }
 
         $housing->delete();
@@ -174,5 +213,10 @@ class HousingsController extends Controller
     private function getEquipmentById($id)
     {
         return Equipment::where(["id", $id])->first();
+    }
+
+    private function getServiceById($id)
+    {
+        return Services::where(["id", $id])->first();
     }
 }

@@ -40,4 +40,14 @@ class Housing extends Models
     {
         return HousingsType::where(["id", $this->housing_types_id])->first();
     }
+
+    public function addService(int $service_id)
+    {
+        $this->attach(Services::class, $service_id);
+    }
+
+    public function getServices()
+    {
+         return $this->belongsToMany(Services::class);
+    }
 }

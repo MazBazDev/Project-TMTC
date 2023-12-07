@@ -2,12 +2,11 @@
 
 namespace app\models;
 
-use app\core\Application;
 use app\core\Models;
 
-class Equipment extends Models
+class Services extends Models
 {
-    protected $table = "equipments";
+    protected $table = "services";
     protected array $fillable = [
         "name",
         "description"
@@ -15,6 +14,6 @@ class Equipment extends Models
 
     public function getHousings()
     {
-        return $this->belongsToManyThrough(Housing::class, 'equipments_housings', 'housings_id', 'equipments_id');
+        return $this->belongsToMany(Housing::class);
     }
 }

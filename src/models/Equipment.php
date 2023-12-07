@@ -15,6 +15,6 @@ class Equipment extends Models
 
     public function getHousings()
     {
-        return $this->belongsToManyThrough(Housing::class, 'equipments_housings', 'housings_id', 'equipments_id');
+        return $this->belongsToMany(Housing::class);
     }
 }

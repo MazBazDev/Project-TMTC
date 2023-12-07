@@ -38,7 +38,7 @@ class EquipmentsController extends Controller
 
     public function show($id)
     {
-        $equipments = $this->getEquipment($id);
+        $equipments = $this->getEquipmentById($id);
         return $this->render("admin.equipments.show", [
             "equipment" => $equipments
         ]);
@@ -46,7 +46,7 @@ class EquipmentsController extends Controller
 
     public function update($id)
     {
-        $equipment = $this->getEquipment($id);
+        $equipment = $this->getEquipmentById($id);
 
         $this->request->validate([
             "name" => "required",
@@ -61,7 +61,7 @@ class EquipmentsController extends Controller
     }
 
     public function delete($id) {
-        $equipment = $this->getEquipment($id);
+        $equipment = $this->getEquipmentById($id);
 
         foreach ($equipment->getHousings() as $housing) {
             $housing->detach(Equipment::class, $equipment->id);
@@ -72,8 +72,8 @@ class EquipmentsController extends Controller
         return Application::$app->response->redirect("dashboard.equipments.index")->with("success", "Equipment deleted !");
     }
 
-    private function getEquipment($id) : Equipment {
-        $equipment = Equipment::where(["id", "=", $id])->get() ?? false;
+    private function getEquipmentById($id) : Equipment {
+        $equipment = Equipment::where(["id", "=", $id])->first() ?? false;
 
         Application::$app->response->abort_if(!$equipment);
 

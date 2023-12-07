@@ -201,7 +201,6 @@ class Models
     {
         $relatedInstance = new $relatedModel();
 
-        dd(Housing::where([$fk, $this->id]));
         return $relatedInstance->where([$fk, '=', $this->id])->get();
     }
 
@@ -215,14 +214,14 @@ class Models
     public function belongsToMany(string $relatedModel)
     {
         // Déterminer le nom de la table pivot en ordre alphabétique
-        //i'm eq i want services
         $tables = [$this->table, (new $relatedModel())->table];
-//    dd($tables);
+
         sort($tables);
         $pivotTable = implode('_', $tables);
+
         // Déterminer les noms des colonnes dans la table pivot
-        $columnA = "{$tables[0]}_id"; // se
-        $columnB = "{$tables[1]}_id"; // eq
+        $columnA = "{$tables[0]}_id";
+        $columnB = "{$tables[1]}_id";
 
         // Retourner les résultats liés
         if ($tables[0] == $this->table) {
@@ -241,33 +240,7 @@ class Models
 
         return $results;
     }
-
-    public function belongsToManyThrough(string $relatedModel)
-    {
-        // Déterminer le nom de la table pivot en ordre alphabétique
-        $tables = [$this->table, (new $relatedModel())->table];
-        sort($tables);
-        $pivotTable = implode('_', $tables);
-
-        // Déterminer les noms des colonnes dans la table pivot
-        $columnA = "{$tables[0]}_id";
-        $columnB = "{$tables[1]}_id";
-
-
-        // Retourner les résultats liés
-        $query = "SELECT {$tables[1]}.* FROM {$tables[1]} JOIN {$pivotTable} ON {$tables[1]}.id = {$pivotTable}.{$columnB} WHERE {$pivotTable}.{$columnA} = {$this->id};";
-
-        try {
-            $stmt = Application::$app->db->pdo->query($query);
-            $results = $stmt->fetchAll(\PDO::FETCH_CLASS, $relatedModel);
-        } catch (\PDOException $e) {
-            echo "Erreur lors de la récupération des données : " . $e->getMessage();
-            $results = [];
-        }
-
-        return $results;
-    }
-
+    
     public function attach(string $relatedModel, int $relatedId)
     {
         $relatedModel = new $relatedModel();

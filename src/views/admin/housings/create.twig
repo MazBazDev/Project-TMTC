@@ -55,6 +55,19 @@
 
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label for="services">Services <sup>* multiple</sup></label>
+                            <select multiple class="form-control" id="services" name="services[]">
+                                <option value="">Any options</option>
+
+                                {% for service in services %}
+                                    <option value="{{ service.id }}">{{ service.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label for="type">Type</label>
                             <select class="form-control" id="type" name="type">
                                 {% for type in types %}

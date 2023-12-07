@@ -6,6 +6,7 @@ use app\controllers\Admin\AdminController;
 use app\controllers\Admin\EquipmentsController;
 use app\controllers\Admin\HousingsController;
 use app\controllers\Admin\HousingsTypesController;
+use app\controllers\Admin\ServicesController;
 use app\controllers\Admin\UsersController;
 use app\controllers\AuthController;
 use app\controllers\HomeController;
@@ -74,6 +75,15 @@ $router->middlewares([IsAuth::class])->group(function (Router $router) {
             $router->name("show")->path('/:id')->get([HousingsTypesController::class, 'show']);
             $router->name("update")->path('/:id')->patch([HousingsTypesController::class, 'update']);
             $router->name("delete")->path('/:id/delete')->delete([HousingsTypesController::class, 'delete']);
+        });
+
+        $router->name("services")->path("/services")->group(function (Router $router) {
+            $router->name("index")->path('/')->get([ServicesController::class, 'index']);
+            $router->name("create")->path('/create')->get([ServicesController::class, 'create']);
+            $router->name("store")->path('/')->post([ServicesController::class, 'store']);
+            $router->name("show")->path('/:id')->get([ServicesController::class, 'show']);
+            $router->name("update")->path('/:id')->patch([ServicesController::class, 'update']);
+            $router->name("delete")->path('/:id/delete')->delete([ServicesController::class, 'delete']);
         });
     });
 });
