@@ -30,7 +30,7 @@ class EquipmentsController extends Controller
 
         $equipment = Equipment::create([
             "name" => $this->request->input("name"),
-            "description" => $this->request->input("description") ?? null
+            "description" => filter_var($this->request->input("description"), FILTER_SANITIZE_FULL_SPECIAL_CHARS)
         ]);
 
         return $this->response->redirect("dashboard.equipments.show", ["id" => $equipment->id])->with("success", "Equipment created !");
@@ -54,7 +54,7 @@ class EquipmentsController extends Controller
 
         $equipment->update([
             "name" => $this->request->input("name"),
-            "description" => $this->request->input("description") ?? null
+            "description" => filter_var($this->request->input("description"), FILTER_SANITIZE_FULL_SPECIAL_CHARS)
         ]);
 
         return Application::$app->response->redirect("dashboard.equipments.show", ["id" => $id])->with("success", "Equipment updated !");

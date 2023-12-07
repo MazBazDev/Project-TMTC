@@ -151,6 +151,35 @@ class Models
         $instance->query .= " WHERE $key $ope '$value'";
         return $instance;
     }
+    public static function whereArr($sub = [])
+    {
+        $instance = new static();
+        $instance->query = "SELECT * FROM {$instance->table}";
+
+        if (!empty($sub)) {
+            $instance->query .= " WHERE ";
+
+            $conditions = [];
+            foreach ($sub as $cond) {
+                $ope = "=";
+
+                if (sizeof($cond) === 2) {
+                    $key = $cond[0];
+                    $value = $cond[1];
+                } elseif (sizeof($cond) === 3) {
+                    $key = $cond[0];
+                    $ope = $cond[1];
+                    $value = $cond[2];
+                }
+
+                $conditions[] = "$key $ope '$value'";
+            }
+
+            $instance->query .= implode(" AND ", $conditions);
+        }
+
+        return $instance;
+    }
 
     public function first()
     {
@@ -240,7 +269,7 @@ class Models
 
         return $results;
     }
-    
+
     public function attach(string $relatedModel, int $relatedId)
     {
         $relatedModel = new $relatedModel();

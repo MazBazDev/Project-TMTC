@@ -4,7 +4,7 @@
 
 {% block content %}
     <H1 class="mb-3">Profile</H1>
-    <div class="card">
+    <div class="card mb-3">
         <div class="card-body">
             <form action="{{ route("profile.update") }}" method="post">
                 {{ method("patch") }}
@@ -63,6 +63,48 @@
 
                 <button class="btn btn-success"><i class="fas fa-save"></i> Save</button>
             </form>
+        </div>
+    </div>
+
+    <H1 class="mb-3">Liked housings</H1>
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex overflow-auto">
+                {% for housing in user.getLikeds() %}
+                    <div class="row">
+                        <div class="col-sm-12 mb-3 mb-sm-0">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title"><a href="{{ route("housings.show", {id : housing.id }) }}">{{ housing.name }}</a></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <hr>
+    <H1 class="mb-3">My bookings</H1>
+    <div class="card mb-3">
+        <div class="card-body">
+            {% for booking in bookings %}
+                <div class="row">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><a href="{{ route("housings.show", {id : booking.getHousing().id }) }}">{{ booking.getHousing().name }}</a></h5>
+
+                                {% set comment = booking.getCommentByUser(user.id) %}
+                                <p class="card-text">{{ comment.stars }} <i class="bi bi-star-fill"></i> | {{ comment.comment }}</p>
+                            </div>
+                            <div class="card-body">
+                                From {{ booking.start_at|date("d/m/Y") }} to {{ booking.end_at|date("d/m/Y") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}

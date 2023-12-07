@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use app\core\Application;
 use app\core\Models;
 
 class Equipment extends Models

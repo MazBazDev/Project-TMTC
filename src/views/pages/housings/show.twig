@@ -1,0 +1,225 @@
+{% extends "layouts/main.twig" %}
+
+{% block title %} {{ housing.name }} {% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="card" style="">
+                <div class="row g-0">
+                    {% if housing.getImages() is not empty %}
+                        <div class="col-md-7 carousel slide" id="caroussel_{{ housing.id }}">
+                            <div class="carousel-indicators">
+                                {% for key, image in housing.getImages() %}
+                                    <button type="button" data-bs-target="#caroussel_{{ housing.id }}" data-bs-slide-to="{{ key }}" {% if key == 0 %}class="active" aria-current="true"{% endif %} aria-label="{{ image.name }}"></button>
+                                {% endfor %}
+                            </div>
+                            <div class="carousel-inner">
+                                {% for key, image in housing.getImages() %}
+                                    <div class="carousel-item {% if key == 0 %} active {% endif %}">
+                                        <img src="{{ image.getPath() }}" style="object-fit: cover;" class="d-block w-100 h-100 img-fluid rounded-start" alt="...">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#caroussel_{{ housing.id }}" data-bs-slide@="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#caroussel_{{ housing.id }}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                    <div class="col-md-5">
+                        <div class="card-body h-100">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h4 class="card-title">{{ housing.getType().name }} | {{ housing.name }}</h4>
+
+                                {% if auth().check() %}
+                                    <a href="{{ route("housings.like", {id : housing.id}) }}" class="btn btn-dark">{% if auth().user().liked(housing.id) %} <i class="bi bi-star-fill"></i> liked {% else %}  <i class="bi bi-star" style="fill: #0f6848"></i> like {% endif %}</a>
+                                {% endif %}
+                            </div>
+                            <p class="card-text">{{ displayhtml(housing.description)|raw }}</p>
+                            <p class="card-text"><i class="bi bi-map"></i> {{ housing.city }}</p>
+                            {% if housing.getEquipments() is not empty %}
+                                <div class="mb-3">Equipments</div>
+                                <div class="d-flex gap-3 overflow-auto mb-3">
+                                    {% for equipment in housing.getEquipments()  %}
+                                        <span class="badge rounded-pill text-bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="{{ displayhtml(equipment.description)|raw }}">{{ equipment.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% if housing.getServices() is not empty %}
+                                <div class="mb-3">Services</div>
+                                <div class="d-flex gap-3 overflow-auto mb-3">
+                                    {% for service in housing.getServices()  %}
+                                        <span class="badge rounded-pill text-bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="{{ displayhtml(service.description)|raw }}">{{ service.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% if housing.active == true %}
+                                <hr>
+                                <h4>Book this housing !</h4>
+                            {% if auth().check() %}
+                                <form action="{{ route("booking.create", {hid : housing.id}) }}" method="post">
+                            {% endif %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="start_date" class="form-label">Start</label>
+                                                <input readonly type="date" class="form-control" id="start-date" name="start-date" value="{{ old("start-date") }}">
+
+                                                {% if error("start-date") %}
+                                                    <div class=invalid-feedback">{{ error("start-date") }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="end-date" class="form-label">End</label>
+                                                <input readonly type="date" class="form-control" id="end-date" name="end-date" value="{{ old("end-date") }}">
+
+                                                {% if error("end-date") %}
+                                                    <div class=invalid-feedback">{{ error("end-date") }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p><span id="price">{{ housing.price }} {{ config("currency") }}</span> (<small>{{ housing.price }} {{ config("currency") }} daily</small>)</p>
+
+                            {% if auth().check() %}
+                                    <button type="submit" class="btn btn-success">Book !</button>
+                                </form>
+                            {%  else %}
+                                <a href="{{ route("login") }}" class="btn btn-success">Login for book</a>
+                            {% endif %}
+                         {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card mb-3">
+                <div class="card-body">
+                    {% if auth().check() %}
+                        {% if auth().user().canComment(housing.id) %}
+
+                            {% set lastBooking = auth().user().lastBookingFor(housing.id) %}
+
+                            <p>Can you rate and comment your last booking from {{ lastBooking.start_at|date("d/m/Y") }} at {{ lastBooking.end_at|date("d/m/Y") }} </p>
+
+                            <form action="{{ route("comments.create", {"housingId" : housing.id}) }}" method="post">
+                                    <div class="mb-3">
+                                        <input type="range" class="form-range" step="1" min="0" max="5" required name="stars" value="{{ old("stars") }}">
+                                        <div class="d-flex justify-content-between">
+                                            {% for i in 0..5 %}
+                                                <span>{{ i }} <i class="bi bi-star-fill"></i></span>
+                                            {% endfor %}
+                                        </div>
+                                        {% if error("stars") %}
+                                            <div class=invalid-feedback">{{ error("stars") }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="comment" class="form-label">Comment</label>
+                                        <textarea class="form-control" id="comment" name="comment" required rows="3"></textarea>
+                                        {% if error("comment") %}
+                                            <div class=invalid-feedback">{{ error("comment") }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                <button type="submit" class="btn btn-success"><i class="bi bi-send"></i> Send comment</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if housing.getComments() is not empty %}
+                        <div class="row">
+                            {% for comment in housing.getComments()  %}
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                {% for i in 0..comment.stars %}
+                                                    <span><i class="bi bi-star-fill"></i></span>
+                                                {% endfor %}
+                                            </h5>
+                                            <p class="card-text"> {{ comment.comment }}</p>
+                                        </div>
+                                        <div class="card-footer">
+                                            <p>Commented by {{ comment.getUser().firstname }} the {{ comment.created_at|date("d/m/Y") }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+    <style>
+        .carousel-inner {
+            height: 0;
+            padding-bottom: 100%; /* this sets carousel aspect ratio (4:1 here) */
+        }
+
+        .carousel-item {
+            position: absolute !important; /* Bootstrap is insistent */
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .carousel-item img {
+            height: 100%; /* Bootstrap handles width already */
+            object-fit: cover; /* or 'contain' if you want stretch instead of crop */
+        }
+    </style>
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
+
+{% block footer_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+
+    <script>
+        const blacklistDates = {{ blacklist_dates|raw }};
+        const currency = "{{ config("currency") }}";
+        const price = "{{ housing.price }}";
+        const priceSpan = document.getElementById("price");
+
+        const picker = new Litepicker({
+            element: document.getElementById('start-date'),
+            elementEnd: document.getElementById('end-date'),
+            singleMode: false,
+            allowRepick: true,
+            disallowLockDaysInRange:true,
+            lockDays: blacklistDates,
+            highlightedDays:blacklistDates,
+            minDate : Date.now(),
+            setup: (picker) => {
+                picker.on('selected', (date1, date2) => {
+                    const timeDiff = Math.abs(date2.getTime() - date1.getTime());
+                    const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+                    const totalPrice = (diffDays + 1) * parseFloat(price);
+                    priceSpan.textContent = totalPrice.toFixed(2) + " " + currency;
+                });
+            },
+        });
+    </script>
+{% endblock %}

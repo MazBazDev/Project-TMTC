@@ -31,7 +31,6 @@ class Response
                 foreach ($params as $key => $value) {
                     $url = str_replace(":$key", $value, $url);
                 }
-
                 header("Location: " . $url);
             }
         }

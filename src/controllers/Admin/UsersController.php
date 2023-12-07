@@ -102,7 +102,7 @@ class UsersController extends Controller
     }
 
     private function getUserById($id) : User {
-        $user = User::where(["id", "=", $id]) ?? false;
+        $user = User::where(["id", "=", $id])->first() ?? false;
 
         Application::$app->response->abort_if(!$user);
 

@@ -30,7 +30,7 @@ class ServicesController extends Controller
 
         $service = Services::create([
             "name" => $this->request->input("name"),
-            "description" => $this->request->input("description") ?? null
+            "description" => filter_var($this->request->input("description") ?? null, FILTER_SANITIZE_FULL_SPECIAL_CHARS)
         ]);
 
         return $this->response->redirect("dashboard.services.show", ["id" => $service->id])->with("success", "Service created !");
@@ -54,7 +54,7 @@ class ServicesController extends Controller
 
         $service->update([
             "name" => $this->request->input("name"),
-            "description" => $this->request->input("description") ?? null
+            "description" => filter_var($this->request->input("description") ?? null, FILTER_SANITIZE_FULL_SPECIAL_CHARS)
         ]);
 
         return Application::$app->response->redirect("dashboard.services.show", ["id" => $id])->with("success", "Service updated !");

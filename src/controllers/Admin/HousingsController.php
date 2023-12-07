@@ -16,11 +16,34 @@ class HousingsController extends Controller
 {
     public function index()
     {
-        $housings = Housing::all();
+        $params = $this->request->getParams();
+
+        if (!empty($params)) {
+            $housings = $this->filter($params);
+        } else {
+            $housings = Housing::all();
+        }
 
         return $this->render("admin.housings.index", [
             "housings" => $housings,
         ]);
+    }
+    private function filter($params){
+
+        $filters = [];
+
+        foreach ($params as $key => $value) {
+            if (strlen($value) == 0 || $value < 0) continue;
+
+            switch ($key) {
+                case "name":
+                    $filters = array_merge($filters, [["name", "LIKE", $value]]);
+                    break;
+            }
+
+        }
+
+        return Housing::whereArr($filters)->get();
     }
 
     public function create()
@@ -40,7 +63,8 @@ class HousingsController extends Controller
             "name" => "required",
             "description" => "required",
             "price" => "required;min:0",
-            "type" => "required"
+            "type" => "required",
+            "city" => "required"
         ]);
 
 
@@ -49,7 +73,8 @@ class HousingsController extends Controller
             "description" => htmlspecialchars_decode($this->request->input("description")),
             "price" => $this->request->input("price"),
             "active" => $this->request->has("active"),
-            "housing_types_id" => intval($this->request->input("type"))
+            "housing_types_id" => intval($this->request->input("type")),
+            "city" => strtolower($this->request->input("city"))
         ]);
 
         $images = $this->request->getFiles("images");
@@ -87,7 +112,6 @@ class HousingsController extends Controller
     public function show($id)
     {
         $housing = $this->getHousing($id);
-
         $availableEquipments = array_udiff(Equipment::all(), $housing->getEquipments(), function ($obj1, $obj2) {
             return $obj1->id - $obj2->id;
         });
@@ -113,15 +137,18 @@ class HousingsController extends Controller
             "name" => "required",
             "description" => "required",
             "price" => "required;min:0",
-            "type" => "required"
+            "type" => "required",
+            "city" => "required"
+
         ]);
 
         $housing->update([
             "name" => $this->request->input("name"),
-            "description" => htmlspecialchars_decode($this->request->input("description")),
+            "description" => filter_var($this->request->input("description"), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
             "price" => $this->request->input("price"),
             "active" => $this->request->has("active"),
             "housing_types_id" => $this->request->input("type"),
+            "city" => strtolower($this->request->input("city"))
         ]);
 
         $images = $this->request->getFiles("images");

@@ -106,3 +106,17 @@ if (!function_exists("dd")) {
         die();
     }
 }
+if (!function_exists("displayHtml")) {
+    function displayhtml($html)
+    {
+        return html_entity_decode($html);
+    }
+}
+
+if (!function_exists("urlParam")) {
+    function urlParam($name)
+    {
+        return Application::$app->request->getParams()[$name] ?? "";
+    }
+}
+

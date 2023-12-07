@@ -9,6 +9,7 @@ use app\controllers\Admin\HousingsTypesController;
 use app\controllers\Admin\ServicesController;
 use app\controllers\Admin\UsersController;
 use app\controllers\AuthController;
+use app\controllers\CommentsController;
 use app\controllers\HomeController;
 use app\core\Application;
 use app\core\routing\Router;
@@ -31,6 +32,18 @@ $router->middlewares([IsNotAuth::class])->group(function (Router $router) {
     $router->name("register.store")->path('/register')->post([AuthController::class, 'register_store']);
 });
 
+$router->name("housings")->path('/housings')->group(function (Router $router) {
+    $router->name("show")->path('/:id')->get([\app\controllers\HousingsController::class, 'show']);
+    $router->name("like")->path('/:id/like')->middlewares([IsAuth::class])->get([\app\controllers\HousingsController::class, 'like']);
+});
+
+$router->name("booking")->path('/booking')->middlewares([IsAuth::class])->group(function (Router $router) {
+    $router->name("create")->path('/:hid')->post([\app\controllers\HousingsController::class, 'book']);
+});
+
+$router->name("comments")->path('/comments')->middlewares([IsAuth::class])->group(function (Router $router) {
+    $router->name("create")->path('/:housingId')->post([CommentsController::class, 'store']);
+});
 $router->middlewares([IsAuth::class])->group(function (Router $router) {
     $router->name("logout")->path('/logout')->post([AuthController::class, 'logout']);
 

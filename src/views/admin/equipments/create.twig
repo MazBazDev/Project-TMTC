@@ -23,7 +23,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea class="form-control" name="description" id="tiny" cols="30" rows="10">{{ old("description") }}</textarea>
+                            <textarea class="form-control" name="description" id="tiny" cols="30" rows="10">{{ twig_raw_filter(old("description"))|raw }}</textarea>
 
                             {% if error("description") %}
                                 <div class=invalid-feedback">{{ error("description") }}</div>

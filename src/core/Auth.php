@@ -2,6 +2,7 @@
 
 namespace app\core;
 
+use app\models\Likes;
 use app\models\User;
 
 class Auth

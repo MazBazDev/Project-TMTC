@@ -14,7 +14,8 @@ class Housing extends Models
         "price",
         "created_at",
         "active",
-        "housing_types_id"
+        "housing_types_id",
+        "city"
     ];
 
     public function addImage(int $image_id)
@@ -49,5 +50,10 @@ class Housing extends Models
     public function getServices()
     {
          return $this->belongsToMany(Services::class);
+    }
+
+    public function getComments()
+    {
+        return Comments::where(["housings_id", $this->id])->get();
     }
 }

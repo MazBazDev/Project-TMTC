@@ -3,9 +3,20 @@
 {% block title %} Housings {% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ route("dashboard.housings.create") }}" class="btn btn-primary"><i class="fas fa-plus"></i> Create</a>
+    <div class="d-flex justify-content-between mb-3">
+        <form action="">
+            <div class="mb-3 d-flex gap-3">
+                <input type="text" class="form-control" id="name" name="name" placeholder="Search name" value="{{ urlparam("name") }}">
+                <button type="submit" class="btn btn-success"><i class="bi bi-search"></i> Search</button>
+            </div>
+        </form>
+        <div>
+            <a href="{{ route("dashboard.housings.create") }}" class="btn btn-primary"><i class="fas fa-plus"></i> Create</a>
+        </div>
     </div>
+
+
+
     <div class="card">
         <div class="card-body table-responsive">
             <table class="table">
@@ -13,6 +24,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
+                    <th scope="col">City</th>
                     <th scope="col">Price</th>
                     <th scope="col">Status</th>
                     <th scope="col">Type</th>
@@ -24,6 +36,7 @@
                         <tr>
                             <th scope="row">{{ housing.id }}</th>
                             <td>{{ housing.name }}</td>
+                            <td>{{ housing.city }}</td>
                             <td>{{ housing.price }}</td>
 
                             {% if housing.active %}

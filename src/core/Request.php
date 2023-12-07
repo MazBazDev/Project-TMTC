@@ -99,7 +99,24 @@ class Request extends Validator
     }
 
 
+    public function getParams()
+    {
+        $params = [];
 
+        if ($this->isGet()) {
+            foreach ($_GET as $key => $value) {
+                $params[$key] = $value;
+            }
+        }
+
+        if ($this->isPost() || $this->isDelete() || $this->isPatch()) {
+            foreach ($_POST as $key => $value) {
+                $params[$key] = $value;
+            }
+        }
+
+        return $params;
+    }
 
 
     public function has($input)

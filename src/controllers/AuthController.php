@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\core\Application;
 use app\core\Auth;
 use app\core\Controller;
+use app\models\Booking;
 use app\models\User;
 
 class AuthController extends Controller
@@ -81,8 +82,10 @@ class AuthController extends Controller
 
     public function profile()
     {
+        $user = Auth::user();
         return $this->render("auth.profile", [
-            "user" => Auth::user(),
+            "user" => $user,
+            "bookings" => Booking::where(["users_id", $user->id])->get()
         ]);
     }
 
