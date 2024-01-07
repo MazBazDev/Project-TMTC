@@ -3,7 +3,7 @@
 namespace app\core;
 
 use app\core\commands\MakeAdminCommand;
-use app\core\Commands\MakeMigrationCommand;
+use app\core\commands\MakeMigrationCommand;
 use app\core\commands\MakeSeederCommand;
 use app\core\commands\MigrateCommand;
 use app\core\commands\SeedCommand;
