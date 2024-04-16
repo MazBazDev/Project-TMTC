@@ -35,7 +35,7 @@ Chef comprend les éléments suivants :
 - Système de migration similaire à Laravel permettant les modifications incrémentales de la base de données.
 - Mini ORM pour interagir avec la base de données SQL, y compris la gestion des relations.
 - Système de seedage de la base de données utilisant Faker.
-- Middleware system.
+- Système de Middlewares.
 - Moteur de template Twig.
 - Système de sessions et de messages flash.
 - CLI avec les fonctionnalités suivantes :
